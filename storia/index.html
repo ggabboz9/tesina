@@ -40,8 +40,15 @@
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <span id="logoText" class="text-xs font-mono tracking-widest text-slate-400">ARGOMENTI</span>
             
-            <!-- Style Toggles (Theme indicator only) -->
+            <!-- Style Toggles (Theme and Download Options) -->
             <div class="flex items-center gap-2">
+                <!-- Download Text File Button -->
+                <button onclick="downloadText()" id="downloadBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition" title="Download Text">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </button>
+
                 <!-- Color Theme Toggle -->
                 <button onclick="toggleTheme()" id="themeBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition">
                     <!-- Dynamic Icon loaded via JavaScript based on current theme -->
@@ -69,7 +76,7 @@
                 <p id="metaText" class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Storia</p>
             </div>
 
-            <!-- Body Text Block (Now supports raw text! Paste whatever you want here) -->
+            <!-- Body Text Block -->
             <div id="bodyDisplay" class="fluid-body-text text-slate-300 space-y-6 smooth-transition">
 Nell’analizzare l’impatto del nucleare sulla storia del Novecento, la storiografia e la sensibilità comune deviano spesso verso un’indebita assimilazione concettuale, racchiudendo i bombardamenti di Hiroshima e Nagasaki e il disastro della centrale di Chernobyl sotto la medesima categoria analitica della catastrofe atomica. Questa sovrapposizione, per quanto suggestiva sul piano dell'impatto emotivo, si rivela logicamente fallace e scientificamente insostenibile. Tra l’atto bellico del 1945 e l'incidente del 1986 non sussiste infatti alcun legame di continuità o di analogia strutturale, se non la condivisione della medesima matrice atomica di partenza. Ci troviamo di fronte a due fenomeni antitetici: il primo è il culmine della ricerca ingegneristica applicata alla distruzione volontaria e istantanea, mentre il secondo è il collasso termodinamico di un sistema civile progettato per la produzione graduale e controllata di energia.
 
@@ -102,6 +109,7 @@ In conclusione, l'accostamento tra Hiroshima e Chernobyl si configura come un er
             logoText: document.getElementById('logoText'),
             themeBtn: document.getElementById('themeBtn'),
             themeIcon: document.getElementById('themeIcon'),
+            downloadBtn: document.getElementById('downloadBtn'),
             progressBar: document.getElementById('progressBar'),
             articleHeader: document.getElementById('articleHeader'),
             headingDisplay: document.getElementById('headingDisplay'),
@@ -143,6 +151,45 @@ In conclusione, l'accostamento tra Hiroshima e Chernobyl si configura come un er
             });
         }
 
+        // Handles plain text compilation and browser download trigger
+        function downloadText() {
+            const title = DOM.headingDisplay.innerText || DOM.headingDisplay.textContent;
+            
+            // Reconstruct plain text from structured body elements
+            let textContent = "";
+            const paragraphs = DOM.bodyDisplay.querySelectorAll('p');
+            if (paragraphs.length > 0) {
+                paragraphs.forEach(p => {
+                    textContent += p.innerText + "\n\n";
+                });
+            } else {
+                textContent = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
+            }
+
+            // Combine title and text into a structured formatting
+            const finalString = `${title.toUpperCase()}\n============================\n\n${textContent.trim()}`;
+            
+            // Create download payload
+            const blob = new Blob([finalString], { type: "text/plain;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            // Generate slug file name from title
+            const fileName = title.toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '') || 'essay';
+                
+            link.href = url;
+            link.setAttribute("download", `${fileName}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
         // Tracks reading progress for the interactive bar at the top
         function updateProgressBar() {
             const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
@@ -175,7 +222,10 @@ In conclusione, l'accostamento tra Hiroshima e Chernobyl si configura come un er
                 DOM.body.className = "bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
                 DOM.appHeader.className = "w-full fixed top-0 left-0 bg-white/90 backdrop-blur-md border-b border-slate-200/80 z-50 smooth-transition";
                 DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-500";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
                 DOM.themeBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
+                
                 DOM.articleHeader.className = "space-y-4 pb-8 border-b border-slate-200 smooth-transition";
                 DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent smooth-transition";
                 DOM.metaText.className = "text-xs font-mono text-indigo-600 uppercase tracking-wider";
@@ -190,7 +240,10 @@ In conclusione, l'accostamento tra Hiroshima e Chernobyl si configura come un er
                 DOM.body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
                 DOM.appHeader.className = "w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition";
                 DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-400";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
                 DOM.themeBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+                
                 DOM.articleHeader.className = "space-y-4 pb-8 border-b border-slate-900 smooth-transition";
                 DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition";
                 DOM.metaText.className = "text-xs font-mono text-indigo-400 uppercase tracking-wider";
@@ -203,7 +256,6 @@ In conclusione, l'accostamento tra Hiroshima e Chernobyl si configura come un er
         }
 
         // Cycle manually triggered by clicking the top right icon (only Dark and Light)
-        // Only trigger if manually chosen; system defaults override on refresh
         function toggleTheme() {
             if (state.theme === 'light') {
                 setTheme('dark');
