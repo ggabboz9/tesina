@@ -36,7 +36,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            /* A subtle overlay to ensure black text always pops, though the original seems to rely purely on the red wash */
+            /* Subtle overlay to ensure high readability */
             background-color: rgba(255, 255, 255, 0.1); 
             background-blend-mode: overlay;
         }
@@ -66,8 +66,6 @@
 
         .line2 {
             display: block;
-            /* The second line is a bit longer, so we keep the font size the same 
-               but let it stretch naturally across the screen */
         }
 
         h2 {
@@ -79,7 +77,6 @@
             margin-top: 1.5vh;
         }
 
-        /* Adjustments for smaller screens/mobile */
         @media (max-width: 768px) {
             h1 {
                 font-size: 10vw;
@@ -100,7 +97,7 @@
             }
         }
 
-        /* Styles for the new bottom buttons */
+        /* Styles for the bottom buttons */
         .button-container {
             position: absolute;
             bottom: 5vh;
@@ -112,8 +109,8 @@
         }
 
         .text-button {
-            text-decoration: none; /* Prevents the default link underline */
-            display: inline-block; /* Allows the scale transition to work perfectly */
+            text-decoration: none; /* Prevents default link underline */
+            display: inline-block; /* Allows scale transition to work perfectly */
             background: none;
             border: none;
             color: #000000;
@@ -145,14 +142,16 @@
             }
         }
 
-        /* Overlay for the 11 topics/subjects */
+        /* Overlay with premium, ultra-smooth transition and subtle blur */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 15, 15, 0.95); /* Deep dark background matching theme */
+            background-color: rgba(10, 10, 10, 0.92); /* Rich deep backdrop */
+            backdrop-filter: blur(8px); /* Modern frosted-glass effect */
+            -webkit-backdrop-filter: blur(8px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -160,25 +159,64 @@
             z-index: 10;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            transform: scale(1.08); /* Start slightly zoomed out for pop-in effect */
+            /* Premium Expo curve for a smooth, high-end feel */
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 2rem;
         }
 
         .overlay.active {
             opacity: 1;
             pointer-events: auto;
-            transform: scale(1);
         }
 
         .overlay-title {
             font-family: 'Russo One', Impact, sans-serif;
-            color: #8b0000; /* Dark crimson red for the header inside overlay */
+            color: #8b0000; /* Dark crimson red for headers inside overlay */
             font-size: 3vw;
             text-transform: uppercase;
-            margin-bottom: 5vh;
+            margin-bottom: 4vh;
             letter-spacing: 0.15vw;
             text-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+            text-align: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .overlay.active .overlay-title {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Map Image container custom smooth scale effect */
+        .map-frame {
+            max-width: 1100px;
+            width: 85%;
+            max-height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid #ffffff;
+            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.4);
+            background-color: #000000;
+            overflow: hidden;
+            border-radius: 4px;
+            transform: scale(0.9) translateY(30px);
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Slide & Pop transition when opened */
+        .overlay.active .map-frame {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .map-image {
+            max-width: 100%;
+            max-height: 68vh;
+            object-fit: contain;
+            display: block;
         }
 
         /* Grid to layout the 11 buttons cleanly */
@@ -189,6 +227,14 @@
             max-width: 1100px;
             width: 90%;
             justify-items: center;
+            transform: scale(0.9) translateY(30px);
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .overlay.active .grid-container {
+            transform: scale(1) translateY(0);
+            opacity: 1;
         }
 
         /* Special alignment for the last row so it looks balanced */
@@ -208,7 +254,7 @@
             width: 100%;
             text-align: center;
             letter-spacing: 0.1vw;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             background: transparent;
             cursor: pointer;
         }
@@ -235,6 +281,7 @@
             cursor: pointer;
             letter-spacing: 0.1vw;
             transition: color 0.2s, transform 0.2s;
+            z-index: 12;
         }
 
         .close-button:hover {
@@ -257,6 +304,13 @@
             .close-button {
                 font-size: 2.5vw;
             }
+            .map-frame {
+                width: 95%;
+                max-height: 65vh;
+            }
+            .map-image {
+                max-height: 63vh;
+            }
         }
 
         @media (max-width: 768px) {
@@ -274,6 +328,13 @@
             }
             .close-button {
                 font-size: 3vw;
+            }
+            .map-frame {
+                width: 95%;
+                max-height: 60vh;
+            }
+            .map-image {
+                max-height: 58vh;
             }
         }
 
@@ -299,6 +360,13 @@
                 top: 2vh;
                 right: 5vw;
             }
+            .map-frame {
+                width: 100%;
+                max-height: 55vh;
+            }
+            .map-image {
+                max-height: 53vh;
+            }
         }
     </style>
 </head>
@@ -314,10 +382,22 @@
         
         <!-- Bottom layout buttons -->
         <div class="button-container">
-            <a href="/mappa.jpg" class="text-button">Mappa</a>
+            <!-- Added id="btn-mappa" to trigger the map display -->
+            <a href="#" id="btn-mappa" class="text-button">Mappa</a>
             <!-- Added id="btn-argomenti" to easily trigger the overlay -->
             <a href="#" id="btn-argomenti" class="text-button">Argomenti</a>
             <a href="#" class="text-button">Presentazioni</a>
+        </div>
+    </div>
+
+    <!-- Mappa conceptual overlay screen -->
+    <div id="overlay-mappa" class="overlay">
+        <button id="btn-close-mappa" class="close-button">Chiudi</button>
+        <h3 class="overlay-title">Mappa Concettuale</h3>
+        
+        <div class="map-frame">
+            <!-- Includes a fallback placeholder in case the local image file hasn't uploaded or matched yet -->
+            <img src="mappa.jpg" alt="Mappa Argomenti" class="map-image" onerror="this.onerror=null; this.src='https://placehold.co/1200x800/151515/ffffff?text=La+Mia+Mappa+Concettuale';">
         </div>
     </div>
 
@@ -327,9 +407,8 @@
         <h3 class="overlay-title">Argomenti</h3>
         
         <div class="grid-container">
-            <!-- 11 placeholder links to customize later -->
             <a href="#" class="subject-button">Italiano</a>
-            <a href="https://ggabboz9.github.io/tesina/storia/" class="subject-button">Storia</a>
+            <a href="#" class="subject-button">Storia</a>
             <a href="#" class="subject-button">Geografia</a>
             <a href="#" class="subject-button">Scienze</a>
             <a href="#" class="subject-button">Tecnologia</a>
@@ -343,19 +422,50 @@
     </div>
 
     <script>
+        // Argomenti Menu Controller
         const btnArgomenti = document.getElementById('btn-argomenti');
         const btnClose = document.getElementById('btn-close');
         const overlayMenu = document.getElementById('overlay-menu');
 
-        // Show the 11 buttons overlay with animation
         btnArgomenti.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevents default link behavior
+            event.preventDefault();
             overlayMenu.classList.add('active');
         });
 
-        // Hide the overlay
         btnClose.addEventListener('click', function() {
             overlayMenu.classList.remove('active');
+        });
+
+        // Mappa Conceptual Map Controller
+        const btnMappa = document.getElementById('btn-mappa');
+        const btnCloseMappa = document.getElementById('btn-close-mappa');
+        const overlayMappa = document.getElementById('overlay-mappa');
+
+        btnMappa.addEventListener('click', function(event) {
+            event.preventDefault();
+            overlayMappa.classList.add('active');
+        });
+
+        btnCloseMappa.addEventListener('click', function() {
+            overlayMappa.classList.remove('active');
+        });
+
+        // CLICK OUTSIDE TO CLOSE CONTROLLERS
+        
+        // Mappa Close on Background Click
+        overlayMappa.addEventListener('click', function(event) {
+            // Check if the clicked target is NOT inside the main content frame and NOT the close button
+            if (!event.target.closest('.map-frame') && !event.target.closest('.close-button') && !event.target.closest('.overlay-title')) {
+                overlayMappa.classList.remove('active');
+            }
+        });
+
+        // Argomenti Close on Background Click
+        overlayMenu.addEventListener('click', function(event) {
+            // Check if the clicked target is NOT inside the grid container, NOT the title, and NOT the close button
+            if (!event.target.closest('.grid-container') && !event.target.closest('.close-button') && !event.target.closest('.overlay-title')) {
+                overlayMenu.classList.remove('active');
+            }
         });
     </script>
 
