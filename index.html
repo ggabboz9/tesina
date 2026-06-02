@@ -174,7 +174,7 @@
             color: #8b0000; /* Dark crimson red for headers inside overlay */
             font-size: 3vw;
             text-transform: uppercase;
-            margin-bottom: 4vh;
+            margin-bottom: 3vh;
             letter-spacing: 0.15vw;
             text-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
             text-align: center;
@@ -188,22 +188,36 @@
             opacity: 1;
         }
 
-        /* Map Image container custom smooth scale effect */
+        /* Dynamic Map Frame - Perfectly fits any landscape, portrait, or square device aspect ratio */
         .map-frame {
-            max-width: 1100px;
-            width: 85%;
-            max-height: 70vh;
+            position: relative;
+            width: 90vw;
+            max-width: 1200px;
+            /* Height adapts automatically to prevent breaking vertical layout on short/portrait screens */
+            height: 68vh; 
+            max-height: 70vw; /* Keeps beautiful proportions on extremely wide desktop layouts */
             display: flex;
             justify-content: center;
             align-items: center;
             border: 3px solid #ffffff;
-            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.4);
-            background-color: #000000;
-            overflow: hidden;
-            border-radius: 4px;
+            box-shadow: 0 10px 35px rgba(139, 0, 0, 0.5);
+            background-color: #0b0b0b;
+            /* Subtly textured background grid for a technical blueprint map feel */
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden; /* Clips the image when panned/zoomed */
+            border-radius: 6px;
             transform: scale(0.9) translateY(30px);
             opacity: 0;
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Responsive override explicitly targetting portrait screens (e.g. phones) */
+        @media (max-aspect-ratio: 1/1) or (max-width: 480px) {
+            .map-frame {
+                height: 60vh;
+                width: 92vw;
+            }
         }
 
         /* Slide & Pop transition when opened */
@@ -212,11 +226,27 @@
             opacity: 1;
         }
 
+        /* Map Image layout setup for dynamic pan/zoom interaction */
+        .map-image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none; /* Prevents default browser panning and zooming when dragging */
+        }
+
         .map-image {
-            max-width: 100%;
-            max-height: 68vh;
+            max-width: 95%;
+            max-height: 95%;
             object-fit: contain;
             display: block;
+            pointer-events: none; /* Prevents dragging the image file itself instead of our pan engine */
+            user-select: none;
+            -webkit-user-drag: none;
+            /* Zoom/pan transformations are updated via JS styling */
+            transform-origin: center center;
+            will-change: transform;
         }
 
         /* Grid to layout the 11 buttons cleanly */
@@ -304,13 +334,6 @@
             .close-button {
                 font-size: 2.5vw;
             }
-            .map-frame {
-                width: 95%;
-                max-height: 65vh;
-            }
-            .map-image {
-                max-height: 63vh;
-            }
         }
 
         @media (max-width: 768px) {
@@ -328,13 +351,6 @@
             }
             .close-button {
                 font-size: 3vw;
-            }
-            .map-frame {
-                width: 95%;
-                max-height: 60vh;
-            }
-            .map-image {
-                max-height: 58vh;
             }
         }
 
@@ -360,13 +376,6 @@
                 top: 2vh;
                 right: 5vw;
             }
-            .map-frame {
-                width: 100%;
-                max-height: 55vh;
-            }
-            .map-image {
-                max-height: 53vh;
-            }
         }
     </style>
 </head>
@@ -382,9 +391,7 @@
         
         <!-- Bottom layout buttons -->
         <div class="button-container">
-            <!-- Added id="btn-mappa" to trigger the map display -->
             <a href="#" id="btn-mappa" class="text-button">Mappa</a>
-            <!-- Added id="btn-argomenti" to easily trigger the overlay -->
             <a href="#" id="btn-argomenti" class="text-button">Argomenti</a>
             <a href="#" class="text-button">Presentazioni</a>
         </div>
@@ -396,8 +403,10 @@
         <h3 class="overlay-title">Mappa Concettuale</h3>
         
         <div class="map-frame">
-            <!-- Includes a fallback placeholder in case the local image file hasn't uploaded or matched yet -->
-            <img src="mappa.jpg" alt="Mappa Argomenti" class="map-image" onerror="this.onerror=null; this.src='https://placehold.co/1200x800/151515/ffffff?text=La+Mia+Mappa+Concettuale';">
+            <!-- Dynamic pan and touch-gesture viewport container -->
+            <div class="map-image-container" id="map-viewer">
+                <img id="map-img-element" src="mappa.jpeg" alt="Mappa Argomenti" class="map-image" onerror="this.onerror=null; this.src='https://placehold.co/1200x800/151515/ffffff?text=La+Mia+Mappa+Concettuale';">
+            </div>
         </div>
     </div>
 
@@ -427,46 +436,200 @@
         const btnClose = document.getElementById('btn-close');
         const overlayMenu = document.getElementById('overlay-menu');
 
-        btnArgomenti.addEventListener('click', function(event) {
-            event.preventDefault();
-            overlayMenu.classList.add('active');
-        });
+        if (btnArgomenti && overlayMenu) {
+            btnArgomenti.addEventListener('click', function(event) {
+                event.preventDefault();
+                overlayMenu.classList.add('active');
+            });
+        }
 
-        btnClose.addEventListener('click', function() {
-            overlayMenu.classList.remove('active');
-        });
+        if (btnClose && overlayMenu) {
+            btnClose.addEventListener('click', function() {
+                overlayMenu.classList.remove('active');
+            });
+        }
 
         // Mappa Conceptual Map Controller
         const btnMappa = document.getElementById('btn-mappa');
         const btnCloseMappa = document.getElementById('btn-close-mappa');
         const overlayMappa = document.getElementById('overlay-mappa');
 
-        btnMappa.addEventListener('click', function(event) {
-            event.preventDefault();
-            overlayMappa.classList.add('active');
-        });
+        if (btnMappa && overlayMappa) {
+            btnMappa.addEventListener('click', function(event) {
+                event.preventDefault();
+                overlayMappa.classList.add('active');
+                resetZoom(); // Reset view whenever map is re-opened
+            });
+        }
 
-        btnCloseMappa.addEventListener('click', function() {
-            overlayMappa.classList.remove('active');
-        });
+        if (btnCloseMappa && overlayMappa) {
+            btnCloseMappa.addEventListener('click', function() {
+                overlayMappa.classList.remove('active');
+            });
+        }
 
         // CLICK OUTSIDE TO CLOSE CONTROLLERS
         
-        // Mappa Close on Background Click
-        overlayMappa.addEventListener('click', function(event) {
-            // Check if the clicked target is NOT inside the main content frame and NOT the close button
-            if (!event.target.closest('.map-frame') && !event.target.closest('.close-button') && !event.target.closest('.overlay-title')) {
-                overlayMappa.classList.remove('active');
-            }
-        });
+        // Mappa Close on Background Click (excluding clicks targetting internal frames or interactive controls)
+        if (overlayMappa) {
+            overlayMappa.addEventListener('click', function(event) {
+                if (!event.target.closest('.map-frame') && !event.target.closest('.close-button') && !event.target.closest('.overlay-title')) {
+                    overlayMappa.classList.remove('active');
+                }
+            });
+        }
 
         // Argomenti Close on Background Click
-        overlayMenu.addEventListener('click', function(event) {
-            // Check if the clicked target is NOT inside the grid container, NOT the title, and NOT the close button
-            if (!event.target.closest('.grid-container') && !event.target.closest('.close-button') && !event.target.closest('.overlay-title')) {
-                overlayMenu.classList.remove('active');
+        if (overlayMenu) {
+            overlayMenu.addEventListener('click', function(event) {
+                if (!event.target.closest('.grid-container') && !event.target.closest('.close-button') && !event.target.closest('.overlay-title')) {
+                    overlayMenu.classList.remove('active');
+                }
+            });
+        }
+
+
+        // ADVANCED PAN & ZOOM ENGINE (Pure Native Vanilla JS)
+        const mapViewer = document.getElementById('map-viewer');
+        const mapImg = document.getElementById('map-img-element');
+
+        let scale = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+
+        // Multi-touch tracking for smart Pinch-to-Zoom on mobile devices
+        let initialPinchDistance = 0;
+
+        // Apply transformations smoothly with boundary guards
+        function updateTransformations() {
+            if (!mapImg || !mapViewer) return;
+
+            // Guard values: clamp boundaries when scaled so map doesn't drift completely off-screen
+            const maxPanX = Math.max(0, (scale - 1) * (mapViewer.clientWidth / 2));
+            const maxPanY = Math.max(0, (scale - 1) * (mapViewer.clientHeight / 2));
+
+            panX = Math.min(Math.max(panX, -maxPanX), maxPanX);
+            panY = Math.min(Math.max(panY, -maxPanY), maxPanY);
+
+            // High performance Hardware Accelerated transforms
+            mapImg.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            
+            // Adjust cursor style depending on zoom state
+            if (scale > 1) {
+                mapViewer.style.cursor = isDragging ? 'grabbing' : 'grab';
+            } else {
+                mapViewer.style.cursor = 'default';
             }
-        });
+        }
+
+        // Standard zoom increment limits
+        function zoom(amount) {
+            scale = Math.min(Math.max(scale + amount, 1), 6); // Max 600% zoom
+            if (scale === 1) {
+                panX = 0;
+                panY = 0;
+            }
+            updateTransformations();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            panX = 0;
+            panY = 0;
+            updateTransformations();
+        }
+
+        if (mapViewer) {
+            // Native Mousewheel zooming
+            mapViewer.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                const change = event.deltaY < 0 ? 0.25 : -0.25;
+                zoom(change);
+            }, { passive: false });
+
+            // Mouse Listeners
+            mapViewer.addEventListener('mousedown', startDrag);
+            
+            // Mobile Touch Listeners (with dual touch gesture tracking)
+            mapViewer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    // Tracking double fingers for pinch gestures
+                    initialPinchDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                } else if (e.touches.length === 1) {
+                    startDrag(e);
+                }
+            }, { passive: true });
+
+            mapViewer.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && initialPinchDistance > 0) {
+                    // Perform Pinch-to-Zoom logic
+                    const currentDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const ratio = currentDistance / initialPinchDistance;
+                    
+                    // Adjust sensitivity
+                    const factor = ratio > 1 ? 0.08 : -0.08;
+                    zoom(factor);
+                    initialPinchDistance = currentDistance; // Update baseline
+                } else if (e.touches.length === 1) {
+                    handleDrag(e);
+                }
+            }, { passive: true });
+
+            mapViewer.addEventListener('touchend', (e) => {
+                stopDrag();
+                if (e.touches.length < 2) {
+                    initialPinchDistance = 0;
+                }
+            });
+        }
+
+        // Global drag handlers for smooth tracking even outside target element bounds
+        window.addEventListener('mousemove', handleDrag);
+        window.addEventListener('mouseup', stopDrag);
+
+        // Start Drag / Pan Interaction (Mouse & Touch compatible)
+        function startDrag(e) {
+            if (scale <= 1) return; // Only pan when zoomed in
+            isDragging = true;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            startX = clientX - panX;
+            startY = clientY - panY;
+
+            if (!e.touches) {
+                e.preventDefault();
+            }
+            updateTransformations();
+        }
+
+        // Dragging / Panning calculations
+        function handleDrag(e) {
+            if (!isDragging) return;
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            panX = clientX - startX;
+            panY = clientY - startY;
+
+            updateTransformations();
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            updateTransformations();
+        }
     </script>
 
 </body>
