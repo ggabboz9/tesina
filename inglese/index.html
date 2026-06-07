@@ -1,1 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inglese</title>
+    <!-- Tailwind CSS for elegant layout and modern design tokens -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth, hardware-accelerated transitions */
+        .smooth-transition {
+            transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
+        /* Fluid typography for heading: locks safely between 2rem and 4rem */
+        .fluid-title {
+            font-size: clamp(2rem, 4vw + 1rem, 4rem);
+            line-height: 1.15;
+        }
+
+        /* Fluid typography for subheadings: locks safely between 1.25rem and 2rem */
+        .fluid-subtitle {
+            font-size: clamp(1.25rem, 2vw + 0.8rem, 2rem);
+            line-height: 1.3;
+        }
+
+        /* Fluid typography for standard body text: locks safely between 1rem and 1.25rem for perfect readability */
+        .fluid-body-text {
+            font-size: clamp(1rem, 0.6vw + 0.8rem, 1.25rem);
+            line-height: 1.75;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition">
+
+    <!-- Top Navigation / Progress Indicator -->
+    <header id="appHeader" class="w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span id="logoText" class="text-xs font-mono tracking-widest text-slate-400">ARGOMENTI</span>
+            
+            <!-- Style Toggles (Theme and Download Options) -->
+            <div class="flex items-center gap-2">
+                <!-- Download Text File Button -->
+                <button onclick="downloadText()" id="downloadBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition" title="Download Text">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </button>
+
+                <!-- Color Theme Toggle -->
+                <button onclick="toggleTheme()" id="themeBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition">
+                    <!-- Dynamic Icon loaded via JavaScript based on current theme -->
+                    <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Scroll Progress Bar -->
+        <div class="w-full h-[2px] bg-slate-900/50">
+            <div id="progressBar" class="h-full w-0 bg-indigo-500 transition-all duration-100"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 w-full max-w-3xl mx-auto px-6 pt-28 pb-16">
+        <article id="readingContent" class="space-y-8">
+            
+            <!-- Article Header -->
+            <div id="articleHeader" class="space-y-6 pb-6 border-b border-slate-900 smooth-transition">
+                <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                    <div class="space-y-2">
+                        <h1 id="headingDisplay" class="fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition">
+                            Bombardamenti di Hiroshima e Nagasaki
+                        </h1>
+                        <p id="metaText" class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Storia</p>
+                    </div>
+
+                    <!-- Version Selector Toggle -->
+                    <div id="versionContainer" class="flex bg-slate-900 border border-slate-800 rounded-xl p-0.5 self-start md:self-auto smooth-transition">
+                        <button onclick="changeVersion('extended')" id="ver-extended" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-300 bg-indigo-600 text-white shadow-md shadow-indigo-600/10">Saggio Esteso</button>
+                        <button onclick="changeVersion('summary')" id="ver-summary" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-300 text-slate-400 hover:text-white">Sintesi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body Text Block with opacity transition hooks -->
+            <div id="bodyDisplay" class="fluid-body-text text-slate-300 space-y-6 opacity-100 transition-opacity duration-300 smooth-transition">
+                <!-- Content is loaded and parsed dynamically here -->
+            </div>
+        </article>
+    </main>
+
+    <!-- Bottom Indicator -->
+    <footer id="appFooter" class="w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition">
+        GABRIELE BRANCIFORTI • TESINA • 3C
+    </footer>
+
+    <!-- Scripting Engine Logic -->
+    <script>
+        // Supported Themes: 'dark', 'light'
+        // Supported Versions: 'extended' (original essay), 'summary' (clean book-style summary)
+        const state = {
+            theme: 'dark',
+            version: 'extended'
+        };
+
+        // Complete Original Version (Unified into a single, continuous reading stream)
+        const extendedData = `Nell’analizzare l’impatto del nucleare sulla storia del Novecento, la storiografia e la sensibilità comune deviano spesso verso un’indebita assimilazione concettuale, racchiudendo i bombardamenti di Hiroshima e Nagasaki e il disastro della centrale di Chernobyl sotto la medesima categoria analitica della catastrofe atomica. Questa sovrapposizione, per quanto suggestiva sul piano dell'impatto emotivo, si rivela logicamente fallace e scientificamente insostenibile. Tra l’atto bellico del 1945 e l'incidente del 1986 non sussiste infatti alcun legame di continuità o di analogia strutturale, se non la condivisione della medesima matrice atomica di partenza. Ci troviamo di fronte a due fenomeni antitetici: il primo è il culmine della ricerca ingegneristica applicata alla distruzione volontaria e istantanea, mentre il secondo è il collasso termodinamico di un sistema civile progettato per la produzione graduale e controllata di energia.
+
+La linea argomentativa a sostegno di questa netta separazione poggia innanzitutto su un pilastro di natura puramente fisica, che scardina l’ipotesi di un funzionamento analogo. Un'arma nucleare, per essere tale, esige una reazione a catena incontrollata, resa possibile solo da un combustibile puro al novanta per cento, il cosiddetto grado militare. Al contrario, il reattore di Chernobyl operava con uranio arricchito appena al due per cento, una concentrazione con la quale la fisica stessa impedisce l'innesco di un'esplosione nucleare. Il disastro del 1986 non fu una detonazione atomica, bensì un'esplosione termoidraulica e convenzionale: il vapore ad altissima pressione generato da un surriscaldamento distrusse fisicamente la struttura, e il successivo incendio della grafite disperse gli elementi radiotossici nell'atmosfera.
+
+A questa profonda faglia scientifica si aggiunge una totale divergenza degli intenti e della gestione tecnologica. I bombardamenti di Hiroshima e Nagasaki risposero a una precisa logica geopolitica di annichilimento calcolato, dove la detonazione in aria fu progettata millimetricamente per ottimizzare l'onda d'urto e cancellare il tessuto urbano sottostante al fine di costringere un intero paese alla resa.
+
+Chernobyl rappresenta l'esatto opposto: un sinistro industriale non intenzionale, scaturito da un cortocircuito burocratico, gravi violazioni dei protocolli di sicurezza durante un test e difetti di progettazione intrinseci all'ingegneria sovietica dell'epoca. Non vi era alcuna volontà distruttiva, bensì un drammatico deficit nella gestione dell'errore e della complessità tecnologica.
+
+La prova empirica più evidente di questa asimmetria risiede infine nella geografia e nel paradosso della persistenza ambientale odierna. Il Giappone ha potuto ricostruire le sue metropoli sulle ceneri del 1945 poiché le bombe contenevano pochi chilogrammi di materiale fissile, esplosi ad alta quota e rapidamente dispersi dalle correnti atmosferiche globali. Chernobyl, al contrario, ha generato una zona di alienazione permanente poiché l'esplosione a livello del suolo di un nocciolo contenente centonovanta tonnellate di combustibile e scorie ha fuso gli isotopi a lungo dimezzamento direttamente nell'ecosistema e nel terreno locale.
+
+In conclusione, l'accostamento tra Hiroshima e Chernobyl si configura come un errore di generalizzazione che confonde gli effetti biologici delle radiazioni con le cause storiche, fisiche e teleologiche che le hanno generate. Separare in modo rigoroso la fenomenologia della bomba atomica dal fallimento della tecnologia di una centrale civile è l'unico binario d'indagine valido per analizzare la storia con onestà intellettuale, comprendendo come il Novecento abbia affrontato la gestione dell'energia atomica sia nelle sue derive distruttive sia nelle sue complesse ambizioni di progresso.`;
+
+        // Book-style Textbook Summary (Sintesi Manualistica, schematica e chiara, unificata)
+        const summaryData = `**1. Il dibattito storico e scientifico sull'atomo**
+La storiografia contemporanea evidenzia come la memoria collettiva compia spesso un grave errore metodologico associando i bombardamenti atomici del 1945 al disastro civile di Chernobyl del 1986. Si tratta in realtà di due fenomeni storicamente e fisicamente antitetici: un atto intenzionale di distruzione militare contrapposto a un collasso termico e tecnico accidentale.
+
+**2. La profonda faglia della fisica dei materiali**
+• **L'ordigno bellico (1945):** Richiede una reazione a catena incontrollata autosostenuta, resa possibile solo utilizzando un combustibile ad altissimo livello di arricchimento nucleare (pari o superiore al 90%).
+• **Il reattore civile (1986):** Funzionava con uranio arricchito unicamente al 2%. Con tale bassa concentrazione, le leggi fisiche della termodinamica escludono a priori qualsiasi possibilità di innesco di una detonazione atomica autonoma. Il collasso a Chernobyl fu infatti un'esplosione termoidraulica di vapore ad altissima pressione, non nucleare.
+
+**3. La contrapposizione teleologica: Intento strategico vs. Incidente civile**
+La distinzione fondamentale tra i due capitoli della storia atomica risiede negli intenti e nella pianificazione strutturale:
+• **Hiroshima e Nagasaki:** Risposero a un preciso e programmatico piano geopolitico americano. La quota di detonazione delle bombe fu programmata millimetricamente sopra i centri urbani per ottimizzare la forza distruttiva dell'onda d'urto e forzare l'imperatore giapponese a una capitolazione incondizionata.
+• **Il disastro di Chernobyl:** Rappresenta invece la totale assenza di intenzionalità bellica. Si è trattato di un catastrofico sinistro industriale generato da una catena di errori burocratici, violazione deliberata delle norme di sicurezza durante un test tecnico e debolezze strutturali note dei reattori sovietici di classe RBMK.
+
+**4. Impatto geografico e paradosso della persistenza sul territorio**
+Le conseguenze ecologiche a lungo termine offrono l'evidenza empirica più netta delle differenze geometriche tra i due fenomeni:
+• **Ricostruzione giapponese:** Hiroshima e Nagasaki sono oggi metropoli attive e popolate. Le bombe contenevano una quantità limitata di materiale fissile esploso in altitudine; le particelle radiotossiche si sono sollevate e disperse rapidamente per effetto delle correnti atmosferiche terrestri.
+• **L'esilio ucraino:** Chernobyl ospita tuttora una zona di esclusione permanente di 30 km. L'incidente ha fuso e depositato a terra oltre 190 tonnellate di combustibile radioattivo ad alto tempo di dimezzamento, contaminando irreversibilmente i terreni, l'ecosistema boschivo e le falde idriche locali per secoli.`;
+
+        const DOM = {
+            body: document.body,
+            appHeader: document.getElementById('appHeader'),
+            logoText: document.getElementById('logoText'),
+            themeBtn: document.getElementById('themeBtn'),
+            themeIcon: document.getElementById('themeIcon'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            progressBar: document.getElementById('progressBar'),
+            articleHeader: document.getElementById('articleHeader'),
+            headingDisplay: document.getElementById('headingDisplay'),
+            metaText: document.getElementById('metaText'),
+            bodyDisplay: document.getElementById('bodyDisplay'),
+            appFooter: document.getElementById('appFooter'),
+            versionContainer: document.getElementById('versionContainer'),
+            verExtended: document.getElementById('ver-extended'),
+            verSummary: document.getElementById('ver-summary')
+        };
+
+        // Helper to grab currently selected dataset
+        function getCurrentDataset() {
+            return state.version === 'summary' ? summaryData : extendedData;
+        }
+
+        // Switch version: extended vs textbook summary
+        function changeVersion(ver) {
+            if (state.version === ver) return;
+            state.version = ver;
+
+            // Fade out
+            DOM.bodyDisplay.classList.add('opacity-0');
+
+            setTimeout(() => {
+                renderBodyText(getCurrentDataset());
+                updateVersionButtons();
+                
+                // Reset scroll to top of reading area smoothly
+                const offsetPosition = DOM.articleHeader.offsetTop - 120;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                // Fade in
+                DOM.bodyDisplay.classList.remove('opacity-0');
+            }, 300);
+        }
+
+        // Automatic content formatting engine for any custom plain text string
+        function renderBodyText(textString) {
+            if (!DOM.bodyDisplay) return;
+
+            // Clear out the block
+            DOM.bodyDisplay.innerHTML = '';
+
+            // Split content into paragraphs using double-newline matching
+            const paragraphs = textString.split(/\n\s*\n+/);
+
+            paragraphs.forEach(paraText => {
+                const cleanText = paraText.trim();
+                if (cleanText) {
+                    const p = document.createElement('p');
+                    p.className = 'smooth-transition';
+                    
+                    // Sanitize and translate breaks
+                    p.innerHTML = cleanText
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;")
+                        .replace(/\n/g, '<br>');
+                        
+                    DOM.bodyDisplay.appendChild(p);
+                }
+            });
+        }
+
+        // Update version picker styles dynamically
+        function updateVersionButtons() {
+            const activeClass = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-300 bg-indigo-600 text-white shadow-md shadow-indigo-600/10";
+            let inactiveClass = "";
+
+            if (state.theme === 'light') {
+                inactiveClass = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-300 text-slate-500 hover:text-slate-900";
+            } else {
+                inactiveClass = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-300 text-slate-400 hover:text-white";
+            }
+
+            if (state.version === 'extended') {
+                DOM.verExtended.className = activeClass;
+                DOM.verSummary.className = inactiveClass;
+            } else {
+                DOM.verExtended.className = inactiveClass;
+                DOM.verSummary.className = activeClass;
+            }
+        }
+
+        // Handles plain text compilation and browser download trigger
+        function downloadText() {
+            const title = DOM.headingDisplay.innerText || DOM.headingDisplay.textContent;
+            
+            // Reconstruct plain text from structured body elements
+            let textContent = "";
+            const paragraphs = DOM.bodyDisplay.querySelectorAll('p');
+            if (paragraphs.length > 0) {
+                paragraphs.forEach(p => {
+                    textContent += p.innerText + "\n\n";
+                });
+            } else {
+                textContent = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
+            }
+
+            // Combine title and selected part text into formatted output
+            const verName = state.version === 'summary' ? 'TRADUZIONE' : 'ORIGINALE';
+            const finalString = `${title.toUpperCase()} - ${verName}\n============================\n\n${textContent.trim()}`;
+            
+            const blob = new Blob([finalString], { type: "text/plain;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            // Generate slug file name from title
+            const fileName = `${title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${state.version}`;
+                
+            link.href = url;
+            link.setAttribute("download", `${fileName}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Tracks reading progress for the interactive bar at the top
+        function updateProgressBar() {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            DOM.progressBar.style.width = scrolled + "%";
+        }
+
+        window.addEventListener('scroll', updateProgressBar);
+
+        // System Dark/Light Mode Auto-detection Engine
+        function detectSystemTheme() {
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Set initial state based on system preference
+            setTheme(systemPrefersDark.matches ? 'dark' : 'light');
+
+            // Listen for system changes in real-time
+            systemPrefersDark.addEventListener('change', (e) => {
+                setTheme(e.matches ? 'dark' : 'light');
+            });
+        }
+
+        // Apply a specific theme's visual configuration
+        function setTheme(newTheme) {
+            state.theme = newTheme;
+
+            if (newTheme === 'light') {
+                // Light Paper Theme
+                DOM.body.className = "bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                DOM.appHeader.className = "w-full fixed top-0 left-0 bg-white/90 backdrop-blur-md border-b border-slate-200/80 z-50 smooth-transition";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-500";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
+                DOM.versionContainer.className = "flex bg-slate-100 border border-slate-200 rounded-xl p-0.5 self-start md:self-auto smooth-transition";
+
+                DOM.articleHeader.className = "space-y-6 pb-6 border-b border-slate-200 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-600 uppercase tracking-wider";
+                DOM.bodyDisplay.className = "fluid-body-text text-slate-700 space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-400 font-mono select-none border-t border-slate-200 max-w-4xl mx-auto smooth-transition";
+                
+                // SVG Moon Icon representing the option to toggle to dark mode
+                DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
+            } 
+            else if (newTheme === 'dark') {
+                // Classic Dark Mode (Slate-950)
+                DOM.body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                DOM.appHeader.className = "w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-400";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+                DOM.versionContainer.className = "flex bg-slate-900 border border-slate-800 rounded-xl p-0.5 self-start md:self-auto smooth-transition";
+
+                DOM.articleHeader.className = "space-y-6 pb-6 border-b border-slate-900 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-400 uppercase tracking-wider";
+                DOM.bodyDisplay.className = "fluid-body-text text-slate-300 space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition";
+                
+                // SVG Sun Icon representing the option to toggle to light mode
+                DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>`;
+            } 
+            updateVersionButtons();
+        }
+
+        // Cycle manually triggered by clicking the top right icon (only Dark and Light)
+        function toggleTheme() {
+            if (state.theme === 'light') {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+
+        // Initialize progress, format text, and load rendering
+        window.onload = function() {
+            renderBodyText(getCurrentDataset()); // Render continuous essay text on launch
+            updateProgressBar();
+            detectSystemTheme(); // Auto-detect and set initial mode
+        };
+    </script>
+</body>
+</html>
