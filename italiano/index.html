@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italiano - Tesina</title>
+    <!-- Tailwind CSS for elegant layout and modern design tokens -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth, hardware-accelerated transitions */
+        .smooth-transition {
+            transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Fluid typography for heading: locks safely between 2rem and 4rem */
+        .fluid-title {
+            font-size: clamp(2rem, 4vw + 1rem, 4rem);
+            line-height: 1.15;
+        }
+
+        /* Fluid typography for subheadings: locks safely between 1.25rem and 2rem */
+        .fluid-subtitle {
+            font-size: clamp(1.25rem, 2vw + 0.8rem, 2rem);
+            line-height: 1.3;
+        }
+
+        /* Fluid typography for standard body text: locks safely between 1rem and 1.25rem for perfect readability */
+        .fluid-body-text {
+            font-size: clamp(1rem, 0.6vw + 0.8rem, 1.25rem);
+            line-height: 1.75;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition">
+
+    <!-- Top Navigation / Progress Indicator -->
+    <header id="appHeader" class="w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span id="logoText" class="text-xs font-mono tracking-widest text-slate-400">ITALIANO</span>
+            
+            <!-- Style Toggles (Theme and Download Options) -->
+            <div class="flex items-center gap-2">
+                <!-- Download Text File Button -->
+                <button onclick="downloadText()" id="downloadBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition" title="Download Text">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </button>
+
+                <!-- Color Theme Toggle -->
+                <button onclick="toggleTheme()" id="themeBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition">
+                    <!-- Dynamic Icon loaded via JavaScript based on current theme -->
+                    <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Scroll Progress Bar -->
+        <div class="w-full h-[2px] bg-slate-900/50">
+            <div id="progressBar" class="h-full w-0 bg-indigo-500 transition-all duration-100"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 w-full max-w-3xl mx-auto px-6 pt-28 pb-16">
+        <article id="readingContent" class="space-y-8">
+            
+            <!-- Article Header -->
+            <div id="articleHeader" class="space-y-4 pb-8 border-b border-slate-900 smooth-transition">
+                <h1 id="headingDisplay" class="fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition">
+                    Primo Levi
+                </h1>
+                <p id="metaText" class="text-xs font-mono text-indigo-400 uppercase tracking-wider"></p>
+            </div>
+
+            <!-- Body Text Block -->
+            <div id="bodyDisplay" class="fluid-body-text text-slate-300 space-y-6 smooth-transition">
+Primo Levi è una delle figure più importanti del Novecento. Non era un letterato di professione, almeno non all'inizio: era un chimico torinese, questo segnò profondamente tutto ciò che ha scritto. La sua è una scrittura precisa, limpida, quasi scientifica, priva di retorica, il che rende i suoi racconti ancora più potenti.
+
+La svolta drammatica della sua vita arriva durante la Seconda Guerra Mondiale. Nel 1943 si unisce a una banda partigiana in Valle d'Aosta, ma viene quasi subito catturato dalla milizia fascista. Essendo ebreo, viene deportato prima nel campo di transito di Fossoli e poi, nel febbraio del 1944, ad Auschwitz.
+
+Levi è uno dei pochissimi che riesce a sopravvivere al campo di sterminio, e ci riesce per una combinazione di fattori, tra cui la fortuna, la giovinezza, ma soprattutto la sua laurea in chimica. Viene infatti impiegato come specialista nel laboratorio della fabbrica di gomma sintetica del campo (la Buna), un lavoro al coperto che lo salva dal freddo assassino dell'inverno polacco.
+
+Quando torna a casa, a Torino, ha addosso un bisogno vitale, quasi fisico, di raccontare quello che ha vissuto. Da questo bisogno nasce il suo capolavoro assoluto: Se questo è un uomo (pubblicato nel 1947). Non è un libro di vendetta o di rabbia, ma un'analisi lucida e profonda di come il sistema dei lager nazisti cercasse di distruggere l'umanità stessa delle persone, prima ancora del loro corpo.
+
+Il seguito ideale di questo libro è La tregua, in cui Levi racconta con un tono più avventuroso e a tratti persino ironico il lungo, assurdo viaggio di ritorno verso l'Italia attraverso un'Europa liberata ma completamente in rovina.
+
+Nel corso della sua vita Levi ha continuato a lavorare come chimico in verniciature, portando avanti parallelamente la scrittura. Ha scritto anche splendidi racconti di finzione e saggistica, come Il sistema periodico, dove ogni capitolo porta il nome di un elemento chimico e si lega a un ricordo della sua vita, e I sommersi e i salvati, la sua ultima opera, in cui torna a riflettere sulla zona grigia della moralità nei campi di concentramento.
+
+Altre opere includono: Storie naturali; Vizio di forma; La chiave a stella.
+
+Primo Levi muore nel 1987 cadendo dalla tromba delle scale del suo palazzo a Torino. Nonostante il peso immenso della memoria che si è portato dietro per tutta la vita, ci ha regalato una delle testimonianze più alte, dignitose e umane sulla capacità dell'uomo di resistere all'orrore.
+            </div>
+        </article>
+    </main>
+
+    <!-- Bottom Indicator -->
+    <footer id="appFooter" class="w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition">
+        GABRIELE BRANCIFORTI • TESINA • 3C
+    </footer>
+
+    <!-- Scripting Engine Logic -->
+    <script>
+        // Supported Themes: 'dark', 'light'
+        const state = {
+            theme: 'dark'
+        };
+
+        const DOM = {
+            body: document.body,
+            appHeader: document.getElementById('appHeader'),
+            logoText: document.getElementById('logoText'),
+            themeBtn: document.getElementById('themeBtn'),
+            themeIcon: document.getElementById('themeIcon'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            progressBar: document.getElementById('progressBar'),
+            articleHeader: document.getElementById('articleHeader'),
+            headingDisplay: document.getElementById('headingDisplay'),
+            metaText: document.getElementById('metaText'),
+            bodyDisplay: document.getElementById('bodyDisplay'),
+            appFooter: document.getElementById('appFooter')
+        };
+
+        // Automatic content formatting engine
+        function formatBodyText() {
+            if (!DOM.bodyDisplay) return;
+
+            // Extract the raw text from the container
+            const rawText = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
+            
+            // Clear out the block
+            DOM.bodyDisplay.innerHTML = '';
+
+            // Split content into paragraphs using double-newline matching
+            const paragraphs = rawText.split(/\n\s*\n+/);
+
+            paragraphs.forEach(paraText => {
+                const cleanText = paraText.trim();
+                if (cleanText) {
+                    const p = document.createElement('p');
+                    p.className = 'smooth-transition';
+                    
+                    // Sanitize raw text to prevent layout breaking, and map single line breaks to HTML breaks
+                    p.innerHTML = cleanText
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;")
+                        .replace(/\n/g, '<br>');
+                        
+                    DOM.bodyDisplay.appendChild(p);
+                }
+            });
+        }
+
+        // Handles plain text compilation and browser download trigger
+        function downloadText() {
+            const title = DOM.headingDisplay.innerText || DOM.headingDisplay.textContent;
+            
+            // Reconstruct plain text from structured body elements
+            let textContent = "";
+            const paragraphs = DOM.bodyDisplay.querySelectorAll('p');
+            if (paragraphs.length > 0) {
+                paragraphs.forEach(p => {
+                    textContent += p.innerText + "\n\n";
+                });
+            } else {
+                textContent = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
+            }
+
+            // Combine title and text into a structured formatting
+            const finalString = `${title.toUpperCase()}\n============================\n\n${textContent.trim()}`;
+            
+            // Create download payload
+            const blob = new Blob([finalString], { type: "text/plain;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            // Generate slug file name from title
+            const fileName = title.toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '') || 'essay';
+                
+            link.href = url;
+            link.setAttribute("download", `${fileName}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Tracks reading progress for the interactive bar at the top
+        function updateProgressBar() {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            DOM.progressBar.style.width = scrolled + "%";
+        }
+
+        window.addEventListener('scroll', updateProgressBar);
+
+        // System Dark/Light Mode Auto-detection Engine
+        function detectSystemTheme() {
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Set initial state based on system preference
+            setTheme(systemPrefersDark.matches ? 'dark' : 'light');
+
+            // Listen for system changes in real-time
+            systemPrefersDark.addEventListener('change', (e) => {
+                setTheme(e.matches ? 'dark' : 'light');
+            });
+        }
+
+        // Apply a specific theme's visual configuration
+        function setTheme(newTheme) {
+            state.theme = newTheme;
+
+            if (newTheme === 'light') {
+                // Light Paper Theme
+                DOM.body.className = "bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                DOM.appHeader.className = "w-full fixed top-0 left-0 bg-white/90 backdrop-blur-md border-b border-slate-200/80 z-50 smooth-transition";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-500";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
+                
+                DOM.articleHeader.className = "space-y-4 pb-8 border-b border-slate-200 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-600 uppercase tracking-wider";
+                DOM.bodyDisplay.className = "fluid-body-text text-slate-700 space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-400 font-mono select-none border-t border-slate-200 max-w-4xl mx-auto smooth-transition";
+                
+                // SVG Moon Icon representing the option to toggle to dark mode
+                DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
+            } 
+            else if (newTheme === 'dark') {
+                // Classic Dark Mode (Slate-950)
+                DOM.body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                DOM.appHeader.className = "w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-400";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+                
+                DOM.articleHeader.className = "space-y-4 pb-8 border-b border-slate-900 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-400 uppercase tracking-wider";
+                DOM.bodyDisplay.className = "fluid-body-text text-slate-300 space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition";
+                
+                // SVG Sun Icon representing the option to toggle to light mode
+                DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>`;
+            } 
+        }
+
+        // Cycle manually triggered by clicking the top right icon (only Dark and Light)
+        function toggleTheme() {
+            if (state.theme === 'light') {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+
+        // Initialize progress, format text, and load rendering
+        window.onload = function() {
+            formatBodyText(); // Run format immediately before anything else
+            updateProgressBar();
+            detectSystemTheme(); // Auto-detect and set initial mode
+        };
+    </script>
+</body>
+</html>
