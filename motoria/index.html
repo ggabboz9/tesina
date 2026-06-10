@@ -1,1 +1,355 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educazione Fisica - Tesina</title>
+    <!-- Tailwind CSS per layout elegante e token di design moderni -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configurazione di Tailwind per utilizzare la modalità scura basata su classi anziché sulle preferenze di sistema
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        /* Transizioni fluide accelerate in hardware */
+        .smooth-transition {
+            transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
+        /* Tipografia fluida per il titolo: varia in sicurezza tra 2rem e 4rem */
+        .fluid-title {
+            font-size: clamp(2rem, 4vw + 1rem, 4rem);
+            line-height: 1.15;
+        }
+
+        /* Tipografia fluida per i sottotitoli: varia in sicurezza tra 1.25rem and 2rem */
+        .fluid-subtitle {
+            font-size: clamp(1.25rem, 2vw + 0.8rem, 2rem);
+            line-height: 1.3;
+        }
+
+        /* Tipografia fluida per il testo del corpo principale: ottimale per la lettura */
+        .fluid-body-text {
+            font-size: clamp(1rem, 0.6vw + 0.8rem, 1.25rem);
+            line-height: 1.75;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition">
+
+    <!-- Navigazione superiore / Indicatore di progresso -->
+    <header id="appHeader" class="w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span id="logoText" class="text-xs font-mono tracking-widest text-slate-400">ARGOMENTI</span>
+            
+            <!-- Controlli stile (Opzioni di download e tema) -->
+            <div class="flex items-center gap-2">
+                <!-- Pulsante Scarica File di Testo -->
+                <button onclick="downloadText()" id="downloadBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition" title="Scarica il testo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </button>
+
+                <!-- Selettore del Tema di Colore -->
+                <button onclick="toggleTheme()" id="themeBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition">
+                    <!-- Icona dinamica caricata via JavaScript in base al tema corrente -->
+                    <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Barra di Progresso Scorrimento -->
+        <div class="w-full h-[2px] bg-slate-900/50">
+            <div id="progressBar" class="h-full w-0 bg-indigo-500 transition-all duration-100"></div>
+        </div>
+    </header>
+
+    <!-- Contenitore Principale -->
+    <main class="flex-1 w-full max-w-3xl mx-auto px-6 pt-28 pb-16">
+        <article id="readingContent" class="space-y-8">
+            
+            <!-- Intestazione dell'Articolo -->
+            <div id="articleHeader" class="space-y-6 pb-6 border-b border-slate-900/80 smooth-transition">
+                <div class="space-y-2">
+                    <h1 id="headingDisplay" class="fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition">
+                        La Pallavolo
+                    </h1>
+                    <p id="metaText" class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Educazione Fisica</p>
+                </div>
+            </div>
+
+            <!-- Area del Testo del Corpo Principale -->
+            <div id="bodyDisplay" class="fluid-body-text text-slate-300 space-y-6 opacity-100 transition-opacity duration-300 smooth-transition">
+                <!-- Il contenuto viene caricato ed elaborato dinamicamente qui -->
+            </div>
+        </article>
+    </main>
+
+    <!-- Piè di pagina -->
+    <footer id="appFooter" class="w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition">
+        GABRIELE BRANCIFORTI • TESINA • 3C
+    </footer>
+
+    <!-- Logica di Scripting dell'Applicazione -->
+    <script>
+        // Temi supportati: 'dark', 'light'
+        const state = {
+            theme: 'dark'
+        };
+
+        // Declarazione dell'oggetto globale DOM per evitare errori di riferimento (ReferenceError)
+        let DOM = {};
+
+        // Saggio Completo Esteso
+        const extendedData = `Primo Levi è una delle figure più importanti del Novecento. Non era un letterato di professione, almeno non all'inizio: era un chimico torinese, questo segnò profondamente tutto ciò che ha scritto. La sua è una scrittura precisa, limpida, quasi scientifica, priva di retorica, il che rende i suoi racconti ancora più potenti.
+
+La svolta drammatica della sua vita arriva durante la Seconda Guerra Mondiale. Nel 1943 si unisce a una banda partigiana in Valle d'Aosta, ma viene quasi subito catturato dalla milizia fascista. Essendo ebreo, viene deportato prima nel campo di transito di Fossoli e poi, nel febbraio del 1944, ad Auschwitz.
+
+Levi è uno dei pochissimi che riesce a sopravvivere al campo di sterminio, e ci riesce per una combinazione di fattori, tra cui la fortuna, la giovinezza, ma soprattutto la sua laurea in chimica. Viene infatti impiegato come specialista nel laboratorio della fabbrica di gomma sintetica del campo (la Buna), un lavoro al coperto che lo salva dal freddo assassino dell'inverno polacco.
+
+Quando torna a casa, a Torino, ha addosso un bisogno vitale, quasi fisico, di raccontare quello che ha vissuto. Da questo bisogno nasce il suo capolavoro assoluto: Se questo è un uomo (pubblicato nel 1947). Non è un libro di vendetta o di rabbia, ma un'analisi lucida e profonda di come il sistema dei lager nazisti cercasse di distruggere l'umanità stessa delle persone, prima ancora del loro corpo.
+
+Il seguito ideale di questo libro è La tregua, in cui Levi racconta con un tono più avventuroso e a tratti persino ironico il lungo, assurdo viaggio di ritorno verso l'Italia attraverso un'Europa liberata ma completamente in rovina.
+
+Nel corso della sua vita Levi ha continuato a lavorare come chimico in verniciature, portando avanti parallelamente la scrittura. Ha scritto anche splendidi racconti di finzione e saggistica, come Il sistema periodico, dove ogni capitolo porta il nome di un elemento chimico e si lega a un ricordo della sua vita, e I sommersi e i salvati, la sua ultima opera, in cui torna a riflettere sulla zona grigia della moralità nei campi di concentramento.
+
+Altre opere includono: Storie naturali; Vizio di forma; La chiave a stella.
+
+Primo Levi muore nel 1987 cadendo dalla tromba delle scale del suo palazzo a Torino. Nonostante il peso immenso della memoria che si è portato dietro per tutta la vita, ci ha regalato una delle testimonianze più alte, dignitose e umane sulla capacità dell'uomo di resistere all'orrore.`;
+
+        // Funzione per mappare gli elementi del DOM una volta che la pagina è pronta
+        function initDOM() {
+            DOM = {
+                body: document.body,
+                appHeader: document.getElementById('appHeader'),
+                logoText: document.getElementById('logoText'),
+                themeBtn: document.getElementById('themeBtn'),
+                themeIcon: document.getElementById('themeIcon'),
+                downloadBtn: document.getElementById('downloadBtn'),
+                progressBar: document.getElementById('progressBar'),
+                articleHeader: document.getElementById('articleHeader'),
+                headingDisplay: document.getElementById('headingDisplay'),
+                metaText: document.getElementById('metaText'),
+                bodyDisplay: document.getElementById('bodyDisplay'),
+                appFooter: document.getElementById('appFooter')
+            };
+        }
+
+        // Analisi sicura della formattazione inline elementare (grassetto, corsivo)
+        function parseInlineFormatting(text) {
+            let result = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+            // Riconoscimento del grassetto Markdown **testo** (usa classi specifiche per il tema)
+            result = result.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-black dark:text-white">$1</strong>');
+            // Riconoscimento del corsivo Markdown *testo*
+            result = result.replace(/\*(.*?)\*/g, '<em class="italic text-black dark:text-slate-200">$1</em>');
+            
+            return result;
+        }
+
+        // Motore di formattazione automatica e rendering strutturato
+        function renderBodyText(textString) {
+            if (!DOM || !DOM.bodyDisplay) return;
+
+            DOM.bodyDisplay.innerHTML = '';
+            const cleanData = textString.replace(/\r\n/g, '\n');
+            const blocks = cleanData.split(/\n\s*\n+/);
+
+            blocks.forEach(block => {
+                const trimmedBlock = block.trim();
+                if (!trimmedBlock) return;
+
+                const lines = trimmedBlock.split('\n');
+                const isBulletList = lines.every(line => /^\s*[•\-\*\d+\.]/.test(line.trim()));
+
+                if (isBulletList && lines.length > 1) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'space-y-4 my-6 pl-2 list-none smooth-transition';
+
+                    lines.forEach(line => {
+                        const li = document.createElement('li');
+                        li.className = 'relative pl-6 text-black dark:text-slate-300 transition-colors duration-300';
+                        
+                        const marker = document.createElement('span');
+                        marker.className = 'absolute left-0 top-2.5 w-1.5 h-1.5 rounded-full bg-indigo-500';
+                        li.appendChild(marker);
+
+                        const cleanLine = line.replace(/^\s*[•\-\*\d+\.]\s*/, '').trim();
+                        li.innerHTML += parseInlineFormatting(cleanLine);
+                        ul.appendChild(li);
+                    });
+
+                    DOM.bodyDisplay.appendChild(ul);
+                } else {
+                    if (trimmedBlock.startsWith('#')) {
+                        const level = (trimmedBlock.match(/^#+/) || ['#'])[0].length;
+                        const cleanText = trimmedBlock.replace(/^#+\s*/, '');
+                        
+                        const heading = document.createElement(level === 1 ? 'h1' : 'h2');
+                        heading.className = level === 1 ? 'fluid-title font-black tracking-tight mt-8 mb-4' : 'fluid-subtitle font-bold text-black dark:text-white pt-6 pb-2';
+                        heading.innerHTML = parseInlineFormatting(cleanText);
+                        DOM.bodyDisplay.appendChild(heading);
+                    }
+                    else if (trimmedBlock.startsWith('**') && trimmedBlock.endsWith('**') && trimmedBlock.length < 120) {
+                        const cleanText = trimmedBlock.replace(/^\*\*|\*\*$/g, '');
+                        const h3 = document.createElement('h3');
+                        h3.className = 'text-lg md:text-xl font-bold text-indigo-600 dark:text-indigo-400 pt-6 pb-2';
+                        h3.innerHTML = parseInlineFormatting(cleanText);
+                        DOM.bodyDisplay.appendChild(h3);
+                    }
+                    else {
+                        const p = document.createElement('p');
+                        p.className = 'smooth-transition text-black dark:text-slate-300 leading-relaxed';
+                        p.innerHTML = parseInlineFormatting(trimmedBlock).replace(/\n/g, '<br>');
+                        DOM.bodyDisplay.appendChild(p);
+                    }
+                }
+            });
+        }
+
+        // Compilazione del file plain text e attivazione del download nel browser
+        function downloadText() {
+            if (!DOM || !DOM.headingDisplay || !DOM.bodyDisplay) return;
+
+            const title = DOM.headingDisplay.innerText || DOM.headingDisplay.textContent;
+            let textContent = "";
+            const paragraphs = DOM.bodyDisplay.querySelectorAll('p, li, h1, h2, h3');
+
+            if (paragraphs.length > 0) {
+                paragraphs.forEach(el => {
+                    if (el.tagName === 'LI') {
+                        textContent += "• " + el.innerText + "\n";
+                    } else if (el.tagName.startsWith('H')) {
+                        textContent += "\n" + el.innerText.toUpperCase() + "\n----------------\n";
+                    } else {
+                        textContent += el.innerText + "\n\n";
+                    }
+                });
+            } else {
+                textContent = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
+            }
+
+            const finalString = `${title.toUpperCase()}\n============================\n\n${textContent.trim()}`;
+            
+            const blob = new Blob([finalString], { type: "text/plain;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            const fileName = `${title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
+                
+            link.href = url;
+            link.setAttribute("download", `${fileName}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Gestisce e aggiorna la barra di avanzamento dello scorrimento
+        function updateProgressBar() {
+            if (!DOM || !DOM.progressBar) return;
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            DOM.progressBar.style.width = scrolled + "%";
+        }
+
+        window.addEventListener('scroll', updateProgressBar);
+
+        // Motore per il rilevamento del tema di sistema chiaro/scuro
+        function detectSystemTheme() {
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Applica la preferenza iniziale del sistema
+            setTheme(systemPrefersDark.matches ? 'dark' : 'light');
+
+            // Resta in ascolto di eventuali modifiche dinamiche al tema del sistema
+            systemPrefersDark.addEventListener('change', (e) => {
+                setTheme(e.matches ? 'dark' : 'light');
+            });
+        }
+
+        // Configura gli stili per il tema selezionato ('light' o 'dark')
+        function setTheme(newTheme) {
+            state.theme = newTheme;
+            if (!DOM || !DOM.body) return;
+
+            if (newTheme === 'light') {
+                // Rimuove la classe dark dall'elemento HTML radice
+                document.documentElement.classList.remove('dark');
+
+                // Tema Chiaro (Ottimizzato con testo nero assoluto nel corpo)
+                DOM.body.className = "bg-slate-50 text-black min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                DOM.appHeader.className = "w-full fixed top-0 left-0 bg-white/90 backdrop-blur-md border-b border-slate-200/80 z-50 smooth-transition";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-600 font-semibold";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 hover:text-black transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 hover:text-black transition-all smooth-transition";
+
+                DOM.articleHeader.className = "space-y-6 pb-6 border-b border-slate-200 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-slate-700 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-700 uppercase tracking-wider font-semibold";
+                DOM.bodyDisplay.className = "fluid-body-text text-black space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-500 font-mono select-none border-t border-slate-200 max-w-4xl mx-auto smooth-transition";
+                
+                // Icona Luna per l'opzione di passaggio al tema scuro
+                DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
+            } 
+            else if (newTheme === 'dark') {
+                // Aggiunge la classe dark all'elemento HTML radice
+                document.documentElement.classList.add('dark');
+
+                // Tema Scuro Classico (Slate-950)
+                DOM.body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                DOM.appHeader.className = "w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-400";
+                
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
+
+                DOM.articleHeader.className = "space-y-6 pb-6 border-b border-slate-900 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-400 uppercase tracking-wider";
+                DOM.bodyDisplay.className = "fluid-body-text text-slate-300 space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition";
+                
+                // Icona Sole per l'opzione di passaggio al tema chiaro
+                DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>`;
+            } 
+            
+            // Ri-renderizza il testo per applicare correttamente le modifiche cromatiche inline
+            renderBodyText(extendedData);
+        }
+
+        // Commutazione manuale del tema avviata tramite click sull'icona
+        function toggleTheme() {
+            if (state.theme === 'light') {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+
+        // Avvio di tutte le componenti al caricamento completo della finestra
+        window.onload = function() {
+            initDOM(); // Mappa gli elementi HTML nell'oggetto globale DOM prima di eseguire qualsiasi logica
+            renderBodyText(extendedData); // Carica il saggio iniziale
+            updateProgressBar(); // Calcola la barra di progresso iniziale
+            detectSystemTheme(); // Rileva il tema di sistema preferito dell'utente
+        };
+    </script>
+</body>
+</html>
