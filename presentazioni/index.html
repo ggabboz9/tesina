@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Minimalist Slide Presenter</title>
+    <title>Presentazione Intera</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -65,6 +65,7 @@
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
                         background-color 0.2s ease, 
                         color 0.2s ease;
+            z-index: 10; /* Ensure buttons sit cleanly above ambient background glow canvas */
         }
         @media (hover: hover) {
             .springy-btn:hover {
@@ -78,6 +79,42 @@
         /* Safe padding support for floating controls */
         #controls-wrapper {
             bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        }
+
+        /* Matte Liquid Glass container styling with relative setup for coordinate cursor light */
+        .matte-liquid-glass {
+            position: relative;
+            background: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 
+                        inset 0 1px 0px 0px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        /* Matte glass interactive spot-glow element */
+        .liquid-glass-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(
+                120px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+                rgba(255, 255, 255, 0.12),
+                rgba(255, 255, 255, 0) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            will-change: background;
+        }
+
+        /* Light up background slightly on active hover states */
+        .matte-liquid-glass:hover .liquid-glass-glow {
+            opacity: 1;
         }
 
         /* Hide scrollbars for the checkpoint track on tiny mobile displays */
@@ -125,35 +162,39 @@
 
     <!-- SECTION TITLE LABEL (Floating above controls) -->
     <div id="section-label-container" class="absolute bottom-32 left-0 right-0 flex justify-center z-40 pointer-events-none">
-        <div id="section-title" class="bg-neutral-900/20 backdrop-blur-2xl border border-white/5 shadow-inner px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-widest text-neutral-300 uppercase opacity-0 transition-all duration-500">
+        <div id="section-title" class="bg-neutral-900/60 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-widest text-neutral-400 uppercase opacity-0 transition-opacity duration-500">
             Section Name
         </div>
     </div>
 
     <!-- FLOATING BOTTOM NAVIGATION TAB -->
     <div id="controls-wrapper" class="absolute left-0 right-0 flex justify-center z-50 transition-all duration-500 ease-in-out transform translate-y-0 opacity-100 max-w-[95%] sm:max-w-max mx-auto select-none">
-        <div class="bg-neutral-900/30 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-full px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-3 sm:gap-5 max-w-full overflow-hidden">
+        <!-- Matte Liquid Glass Container Capsule with Balanced Uniform Padding -->
+        <div id="matte-glass-container" class="matte-liquid-glass rounded-full p-1.5 sm:p-2 flex items-center gap-3 sm:gap-5 max-w-full overflow-hidden">
             
+            <!-- Mouse Coordinates Spot-light Glow Layer -->
+            <div id="glass-spot-glow" class="liquid-glass-glow"></div>
+
             <!-- Previous Button -->
-            <button id="prev-btn" class="w-11 h-11 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-full text-neutral-300 hover:text-white hover:bg-white/10 springy-btn" title="Previous Slide (Left Arrow)">
+            <button id="prev-btn" class="w-11 h-11 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-white hover:bg-white/10 springy-btn" title="Previous Slide (Left Arrow)">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
             </button>
             
             <!-- Slide Counter -->
-            <div class="text-xs shrink-0 font-semibold tracking-widest text-neutral-400 hover:text-white transition-all font-mono w-16 text-center select-none cursor-pointer hover:scale-105 active:scale-95 duration-150 py-1" id="slide-counter">
+            <div class="text-xs shrink-0 font-semibold tracking-widest text-neutral-400 hover:text-white transition-all font-mono w-16 text-center select-none cursor-pointer hover:scale-105 active:scale-95 duration-150 py-1 z-10" id="slide-counter">
                 1 / 1
             </div>
 
             <!-- Optional Checkpoint Divider -->
-            <div id="ui-divider" class="w-[1px] h-5 shrink-0 bg-neutral-800/80 transition-all duration-500 ease-out opacity-0 max-w-0 hidden"></div>
+            <div id="ui-divider" class="w-[1px] h-5 shrink-0 bg-white/10 transition-all duration-500 ease-out opacity-0 max-w-0 hidden"></div>
 
             <!-- Clickable Checkpoint Timeline Dots -->
-            <div id="checkpoints-container" class="checkpoints-tray flex items-center gap-1 py-1 overflow-x-auto no-scrollbar opacity-0 max-w-0 pointer-events-none hidden">
+            <div id="checkpoints-container" class="checkpoints-tray flex items-center gap-1 py-1 overflow-x-auto no-scrollbar opacity-0 max-w-0 pointer-events-none hidden z-10">
                 <!-- Clickable dots generated dynamically via JS -->
             </div>
             
             <!-- Next Button -->
-            <button id="next-btn" class="w-11 h-11 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-white hover:bg-neutral-900 springy-btn" title="Next Slide (Right Arrow / Space)">
+            <button id="next-btn" class="w-11 h-11 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-white hover:bg-white/10 springy-btn" title="Next Slide (Right Arrow / Space)">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
             
@@ -174,11 +215,10 @@
             transitionStyle: 'slide-directional',
 
             // Duration of the transitions in milliseconds (Buttely-smooth 500ms)
-            transitionDuration: 500,
+            transitionDuration: 800,
 
             // How many slides do you want to show? 
             // Set to 0 or null to automatically use all images in the slides array below.
-            // Example: setting this to 15 will limit the deck to the first 15 slides.
             limitNumberOfSlides: 0,
 
             // Set to false to completely hide/disable the visual arrows & counters.
@@ -204,9 +244,6 @@
         // ==========================================
         // 2. SLIDE DATA: 32 DIVERSE JPG IMAGE URLS
         // ==========================================
-        // Each slide can have a custom 'name' parameter.
-        // - Slides sharing the SAME 'name' will be MERGED into a single checkpoint.
-        // - Slides with NO 'name' will automatically inherit the section/checkpoint of the preceding slide.
         const slides = [
             { url: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=1920&q=80", name: "Introduction" }, // Slide 1
             { url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80", name: "Introduction" }, // Slide 2
@@ -271,6 +308,8 @@
         const loadingSpinner = document.getElementById('loading-spinner');
         
         const controlsWrapper = document.getElementById('controls-wrapper');
+        const matteGlassContainer = document.getElementById('matte-glass-container');
+        const glassSpotGlow = document.getElementById('glass-spot-glow');
         const toggleUiBtn = document.getElementById('toggle-ui-btn');
         const toggleUiIcon = document.getElementById('toggle-ui-icon');
 
@@ -327,6 +366,18 @@
 
             // Initiate the sequential loader thread
             preloadNext();
+        }
+
+        // Setup the liquid glass coordinate tracker for hovering cursor glow
+        function setupLiquidGlassTracker() {
+            matteGlassContainer.addEventListener('mousemove', (e) => {
+                const rect = matteGlassContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x coordinate relative to container
+                const y = e.clientY - rect.top;  // y coordinate relative to container
+
+                matteGlassContainer.style.setProperty('--mouse-x', `${x}px`);
+                matteGlassContainer.style.setProperty('--mouse-y', `${y}px`);
+            });
         }
 
         // Resolves the name of a slide at any index by looking backwards for the most recent named slide
@@ -389,6 +440,9 @@
                         expandCheckpointsTray(false);
                     }
                 }
+
+                // Start interactive liquid glass glow track
+                setupLiquidGlassTracker();
             }
         }
 
@@ -733,6 +787,32 @@
             }
         }
 
+        // Section jumping logic
+        function goToNextCheckpoint() {
+            if (checkpointMapping.length === 0) return;
+            const currentSectionName = getResolvedSectionName(currentIndex);
+            const currentCheckpointIdx = checkpointMapping.findIndex(m => m.sectionName === currentSectionName);
+            
+            if (currentCheckpointIdx !== -1 && currentCheckpointIdx < checkpointMapping.length - 1) {
+                updateSlide(checkpointMapping[currentCheckpointIdx + 1].firstSlideIndex);
+            } else {
+                updateSlide(checkpointMapping[0].firstSlideIndex);
+            }
+        }
+
+        // Section jumping logic (Previous)
+        function goToPrevCheckpoint() {
+            if (checkpointMapping.length === 0) return;
+            const currentSectionName = getResolvedSectionName(currentIndex);
+            const currentCheckpointIdx = checkpointMapping.findIndex(m => m.sectionName === currentSectionName);
+            
+            if (currentCheckpointIdx > 0) {
+                updateSlide(checkpointMapping[currentCheckpointIdx - 1].firstSlideIndex);
+            } else {
+                updateSlide(checkpointMapping[checkpointMapping.length - 1].firstSlideIndex);
+            }
+        }
+
         // Event Listeners for Buttons
         prevBtn.addEventListener('click', () => updateSlide(currentIndex - 1));
         nextBtn.addEventListener('click', () => updateSlide(currentIndex + 1));
@@ -753,7 +833,7 @@
             }
         });
 
-        // Touch swipe gestures for mobile aspect ratios
+        // Touch swipe gestures for general viewport/slide area (swipes slides)
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -774,6 +854,42 @@
                 updateSlide(currentIndex + 1); 
             } else if (touchEndX > touchStartX + swipeThreshold) {
                 updateSlide(currentIndex - 1); 
+            }
+        }
+
+        // Specialized touch swipe gestures on the bottom bar
+        let barTouchStartX = 0;
+
+        controlsWrapper.addEventListener('touchstart', (e) => {
+            barTouchStartX = e.changedTouches[0].screenX;
+            // Prevent the swipe from bubbling up to document and causing double slide moves
+            e.stopPropagation();
+        }, { passive: true });
+
+        controlsWrapper.addEventListener('touchend', (e) => {
+            const barTouchEndX = e.changedTouches[0].screenX;
+            if (CONFIG.enableSwipeNavigation) {
+                handleBarSwipe(barTouchStartX, barTouchEndX);
+            }
+            e.stopPropagation();
+        }, { passive: true });
+
+        // Swiping the bottom control bar now ALWAYS swipes between checkpoints/sections
+        // regardless of whether the visual checkpoint timeline menu tray is open or closed!
+        function handleBarSwipe(startX, endX) {
+            const swipeThreshold = 40; 
+            if (endX < startX - swipeThreshold) {
+                if (CONFIG.showCheckpoints && checkpointMapping.length > 0) {
+                    goToNextCheckpoint(); // Jump directly to next checkpoint section
+                } else {
+                    updateSlide(currentIndex + 1); // Fallback if checkpoints disabled
+                }
+            } else if (endX > startX + swipeThreshold) {
+                if (CONFIG.showCheckpoints && checkpointMapping.length > 0) {
+                    goToPrevCheckpoint(); // Jump directly to previous checkpoint section
+                } else {
+                    updateSlide(currentIndex - 1); // Fallback if checkpoints disabled
+                }
             }
         }
 
