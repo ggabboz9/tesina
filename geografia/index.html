@@ -1,32 +1,40 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geografia - Tesina</title>
-    <!-- Tailwind CSS for elegant layout and modern design tokens -->
+    <!-- Tailwind CSS per layout elegante e token di design moderni -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configurazione di Tailwind per utilizzare la modalità scura basata su classi anziché sulle preferenze di sistema
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <style>
-        /* Smooth, hardware-accelerated transitions */
+        /* Transizioni fluide accelerate in hardware */
         .smooth-transition {
             transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
                         border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                        color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                        color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Fluid typography for heading: locks safely between 2rem and 4rem */
+        /* Tipografia fluida per il titolo: varia in sicurezza tra 2rem e 4rem */
         .fluid-title {
             font-size: clamp(2rem, 4vw + 1rem, 4rem);
             line-height: 1.15;
         }
 
-        /* Fluid typography for subheadings: locks safely between 1.25rem and 2rem */
+        /* Tipografia fluida per i sottotitoli: varia in sicurezza tra 1.25rem and 2rem */
         .fluid-subtitle {
             font-size: clamp(1.25rem, 2vw + 0.8rem, 2rem);
             line-height: 1.3;
         }
 
-        /* Fluid typography for standard body text: locks safely between 1rem and 1.25rem for perfect readability */
+        /* Tipografia fluida per il testo del corpo principale: ottimale per la lettura */
         .fluid-body-text {
             font-size: clamp(1rem, 0.6vw + 0.8rem, 1.25rem);
             line-height: 1.75;
@@ -35,165 +43,220 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition">
 
-    <!-- Top Navigation / Progress Indicator -->
+    <!-- Navigazione superiore / Indicatore di progresso -->
     <header id="appHeader" class="w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <span id="logoText" class="text-xs font-mono tracking-widest text-slate-400">GEOGRAFIA</span>
+            <span id="logoText" class="text-xs font-mono tracking-widest text-slate-400">ARGOMENTI</span>
             
-            <!-- Style Toggles (Theme and Download Options) -->
+            <!-- Controlli stile (Opzioni di download e tema) -->
             <div class="flex items-center gap-2">
-                <!-- Download Text File Button -->
-                <button onclick="downloadText()" id="downloadBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition" title="Download Text">
+                <!-- Pulsante Scarica File di Testo -->
+                <button onclick="downloadText()" id="downloadBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition" title="Scarica il testo">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
                 </button>
 
-                <!-- Color Theme Toggle -->
+                <!-- Selettore del Tema di Colore -->
                 <button onclick="toggleTheme()" id="themeBtn" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition">
-                    <!-- Dynamic Icon loaded via JavaScript based on current theme -->
+                    <!-- Icona dinamica caricata via JavaScript in base al tema corrente -->
                     <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </button>
             </div>
         </div>
-        <!-- Scroll Progress Bar -->
+        <!-- Barra di Progresso Scorrimento -->
         <div class="w-full h-[2px] bg-slate-900/50">
             <div id="progressBar" class="h-full w-0 bg-indigo-500 transition-all duration-100"></div>
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- Contenitore Principale -->
     <main class="flex-1 w-full max-w-3xl mx-auto px-6 pt-28 pb-16">
         <article id="readingContent" class="space-y-8">
             
-            <!-- Article Header -->
-            <div id="articleHeader" class="space-y-4 pb-8 border-b border-slate-900 smooth-transition">
-                <h1 id="headingDisplay" class="fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition">
-                    Chernobyl, Città fantasma
-                </h1>
-                <p id="metaText" class="text-xs font-mono text-indigo-400 uppercase tracking-wider"></p>
+            <!-- Intestazione dell'Articolo -->
+            <div id="articleHeader" class="space-y-6 pb-6 border-b border-slate-900/80 smooth-transition">
+                <div class="space-y-2">
+                    <h1 id="headingDisplay" class="fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition">
+                        Chernobyl, città abbandonata
+                    </h1>
+                    <p id="metaText" class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Geografia</p>
+                </div>
             </div>
 
-            <!-- Body Text Block -->
-            <div id="bodyDisplay" class="fluid-body-text text-slate-300 space-y-6 smooth-transition">
-Nei primi due anni di guerra gli Stati Uniti rimasero fuori dal conflitto. L'opinione pubblica americana era contraria all'intervento diretto in Europa, ma il presidente Roosevelt, appoggiò economicamente lo sforzo inglese con la legge «affitti e prestiti». Nell'aprile 1941 Roosevelt e Churchill si incontrarono nell'isola canadese di Terranova e firmarono la Carta atlantica, un documento in cui si delineavano le linee guida per un nuovo ordine mondiale, basato sull'autodeterminazione dei popoli e la liberalizzazione dei mercati. Gli Stati Uniti, attaccati dal Giappone, entrano in guerra Il 7 dicembre 1941, il Giappone aggredì senza preavviso la flotta americana nella base di Pearl Harbor, nelle isole Hawaii; l'aggressione provocò l'ingresso in guerra degli Stati Uniti contro il Giappone. Pochi giorni dopo la Germania dichiarò guerra agli Stati Uniti, seguita dall'Italia. Da quel momento la guerra in Europa e quella nel Pacifico divennero un solo immane conflitto mondiale.
-
-Quasi 4 anni dopo, sul fronte del Pacifico, dopo le grandi vittorie aeronavali le truppe americane si avvicinavano ormai al territorio giapponese. Ma la resistenza tenace e disperata dei Giapponesi - che usarono anche kamikaze, piloti suicidi che guidavano aerei carichi di esplosivo contro le navi nemiche - infliggeva gravi perdite agli Americani. Il nuovo presidente degli Stati Uniti, Harry Truman, prese allora la decisione di usare contro il Giappone la bomba atomica. Il 6 agosto 1945 la prima bomba atomica, sganciata sulla città di Hiroshima, provocò la morte immediata di 90000 persone, a cui seguirono nei giorni successivi altre migliaia di morti a causa delle radiazioni. Tre giorni dopo un'altra bomba fu sganciata sulla città di Nagasaki, dove morirono oltre 50000 persone. Infine, anche l'URSS dichiarò guerra al Giappone, che firmò la resa il 2 settembre 1945. Con la resa del Giappone si concludeva la seconda guerra mondiale, una catastrofe che provocò oltre cinquantacinque milioni di morti. Per la prima volta nella storia contemporanea, le vittime civili (trenta milioni) superavano quelle militari.
-
-Nell’analizzare l’impatto del nucleare sulla storia del Novecento, la storiografia e la sensibilità comune racchiudono i bombardamenti di Hiroshima e Nagasaki e il disastro della centrale di Chernobyl sotto la stessa categoria della catastrofe atomica.In realtà, tra l’atto bellico del 1945 e l'incidente del 1986 non esiste infatti alcun legame, se non la condivisione dello stesso materiale atomico di partenza. Ci troviamo di fronte a due fenomeni antitetici: il primo è il culmine della ricerca ingegneristica applicata alla distruzione volontaria e istantanea, mentre il secondo è il collasso termodinamico di un sistema civile progettato per la produzione graduale e controllata di energia.
-
-L'arma nucleare, per essere tale, esige una reazione a catena incontrollata, resa possibile solo da un combustibile puro al novanta per cento, il cosiddetto grado militare. Al contrario, il reattore di Chernobyl operava con uranio arricchito appena al due per cento, una concentrazione con la quale la fisica stessa impedisce l'innesco di un'esplosione nucleare. Il disastro del 1986 non fu una detonazione atomica, bensì un'esplosione termoidraulica e convenzionale: il vapore ad altissima pressione generato da un surriscaldamento distrusse fisicamente la struttura, e il successivo incendio della grafite disperse gli elementi radiotossici nell'atmosfera.
-
-A questa profonda faglia scientifica si aggiunge una totale divergenza degli intenti e della gestione tecnologica. I bombardamenti di Hiroshima e Nagasaki furono progettati millimetricamente per ottimizzare l'onda d'urto e cancellare le intere abitazioni, al fine di costringere un intero paese alla resa. Chernobyl rappresenta l'esatto opposto: un incidente industriale non intenzionale, scaturito da un cortocircuito burocratico, gravi violazioni dei protocolli di sicurezza durante un test e difetti di progettazione intrinseci all'ingegneria sovietica dell'epoca. Non vi era alcuna volontà distruttiva, bensì un drammatico deficit nella gestione dell'errore e della complessità tecnologica.
-
-
+            <!-- Area del Testo del Corpo Principale -->
+            <div id="bodyDisplay" class="fluid-body-text text-slate-300 space-y-6 opacity-100 transition-opacity duration-300 smooth-transition">
+                <!-- Il contenuto viene caricato ed elaborato dinamicamente qui -->
             </div>
         </article>
     </main>
 
-    <!-- Bottom Indicator -->
+    <!-- Piè di pagina -->
     <footer id="appFooter" class="w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition">
         GABRIELE BRANCIFORTI • TESINA • 3C
     </footer>
 
-    <!-- Scripting Engine Logic -->
+    <!-- Logica di Scripting dell'Applicazione -->
     <script>
-        // Supported Themes: 'dark', 'light'
+        // Temi supportati: 'dark', 'light'
         const state = {
             theme: 'dark'
         };
 
-        const DOM = {
-            body: document.body,
-            appHeader: document.getElementById('appHeader'),
-            logoText: document.getElementById('logoText'),
-            themeBtn: document.getElementById('themeBtn'),
-            themeIcon: document.getElementById('themeIcon'),
-            downloadBtn: document.getElementById('downloadBtn'),
-            progressBar: document.getElementById('progressBar'),
-            articleHeader: document.getElementById('articleHeader'),
-            headingDisplay: document.getElementById('headingDisplay'),
-            metaText: document.getElementById('metaText'),
-            bodyDisplay: document.getElementById('bodyDisplay'),
-            appFooter: document.getElementById('appFooter')
-        };
+        // Declarazione dell'oggetto globale DOM per evitare errori di riferimento (ReferenceError)
+        let DOM = {};
 
-        // Automatic content formatting engine
-        function formatBodyText() {
-            if (!DOM.bodyDisplay) return;
+        // Saggio Completo Esteso
+        const extendedData = `La città di Pripyat (soprannominata "Città di Chernobyl") non è diventata una città abbandonata perché le persone hanno deciso di andarsene poco alla volta. È successo tutto in un istante, a causa di un grave incidente. Oggi, guardando questa città, ci si rende conto che è diventata qualcosa di molto diverso da quello che era un tempo: non è più un posto dove la gente vive, lavora e si incontra, ma un luogo dove il tempo sembra essersi fermato.
 
-            // Extract the raw text from the container
-            const rawText = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
+Dal punto di vista della geografia, Chernobyl ha subìto un cambiamento radicale. Prima era un centro abitato, collegato ad altri posti da strade e scambi di ogni tipo. Poi è arrivata la "Zona di Alienazione", un confine che nessuno può superare senza autorizzazione. Da quel momento, la città ha perso il suo scopo originale: le case, le piazze e le strade non servono più a ospitare la vita di tutti i giorni, ma sono diventate aree controllate dove l'unica cosa che conta è la sicurezza legata alle radiazioni.
+
+Un altro aspetto affascinante e un po’ inquietante è come la natura si stia riprendendo i suoi spazi. Quando l’uomo se ne va, la natura ricomincia a crescere senza freni. Oggi, alberi e piante stanno invadendo i viali, coprendo i palazzi e spaccando l’asfalto delle strade. È come se la foresta volesse cancellare le tracce di quello che abbiamo costruito noi. Questa non è più una città di cemento, ma un posto dove i confini tra ciò che è stato fatto dall'uomo e ciò che è selvaggio stanno svanendo, creando un paesaggio nuovo, quasi magico.
+
+La città è affiancata dal fiume Pripjat (in ucraino Pryp"jat'?), con vaste paludi. Il territorio circostante presenta pianure, laghi, pozze, paludi e stagni.
+Gli inverni sono rigidi con abbondanti nevicate, con temperature che abitualmente scendono sotto i -20 °C. Le estati sono fresche e ventilate con poche precipitazioni e la temperatura verso luglio-agosto non supera i 32 °C.
+
+Stato dell’Europa orientale, confinante a N e a E con la Russia, ancora a N con la Bielorussia, a S con la Romania e la Moldavia, a SO con l’Ungheria, a O con la Slovacchia e la Polonia; si affaccia inoltre, per un ampio tratto, sul Mar Nero.`;
+
+        // Funzione per mappare gli elementi del DOM una volta che la pagina è pronta
+        function initDOM() {
+            DOM = {
+                body: document.body,
+                appHeader: document.getElementById('appHeader'),
+                logoText: document.getElementById('logoText'),
+                themeBtn: document.getElementById('themeBtn'),
+                themeIcon: document.getElementById('themeIcon'),
+                downloadBtn: document.getElementById('downloadBtn'),
+                progressBar: document.getElementById('progressBar'),
+                articleHeader: document.getElementById('articleHeader'),
+                headingDisplay: document.getElementById('headingDisplay'),
+                metaText: document.getElementById('metaText'),
+                bodyDisplay: document.getElementById('bodyDisplay'),
+                appFooter: document.getElementById('appFooter')
+            };
+        }
+
+        // Analisi sicura della formattazione inline elementare (grassetto, corsivo)
+        function parseInlineFormatting(text) {
+            let result = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+            // Riconoscimento del grassetto Markdown **testo** (usa classi specifiche per il tema)
+            result = result.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-black dark:text-white">$1</strong>');
+            // Riconoscimento del corsivo Markdown *testo*
+            result = result.replace(/\*(.*?)\*/g, '<em class="italic text-black dark:text-slate-200">$1</em>');
             
-            // Clear out the block
+            return result;
+        }
+
+        // Motore di formattazione automatica e rendering strutturato
+        function renderBodyText(textString) {
+            if (!DOM || !DOM.bodyDisplay) return;
+
             DOM.bodyDisplay.innerHTML = '';
+            const cleanData = textString.replace(/\r\n/g, '\n');
+            const blocks = cleanData.split(/\n\s*\n+/);
 
-            // Split content into paragraphs using double-newline matching
-            const paragraphs = rawText.split(/\n\s*\n+/);
+            blocks.forEach(block => {
+                const trimmedBlock = block.trim();
+                if (!trimmedBlock) return;
 
-            paragraphs.forEach(paraText => {
-                const cleanText = paraText.trim();
-                if (cleanText) {
-                    const p = document.createElement('p');
-                    p.className = 'smooth-transition';
-                    
-                    // Sanitize raw text to prevent layout breaking, and map single line breaks to HTML breaks
-                    p.innerHTML = cleanText
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;")
-                        .replace(/'/g, "&#039;")
-                        .replace(/\n/g, '<br>');
+                const lines = trimmedBlock.split('\n');
+                const isBulletList = lines.every(line => /^\s*[•\-\*\d+\.]/.test(line.trim()));
+
+                if (isBulletList && lines.length > 1) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'space-y-4 my-6 pl-2 list-none smooth-transition';
+
+                    lines.forEach(line => {
+                        const li = document.createElement('li');
+                        li.className = 'relative pl-6 text-black dark:text-slate-300 transition-colors duration-300';
                         
-                    DOM.bodyDisplay.appendChild(p);
+                        const marker = document.createElement('span');
+                        marker.className = 'absolute left-0 top-2.5 w-1.5 h-1.5 rounded-full bg-indigo-500';
+                        li.appendChild(marker);
+
+                        const cleanLine = line.replace(/^\s*[•\-\*\d+\.]\s*/, '').trim();
+                        li.innerHTML += parseInlineFormatting(cleanLine);
+                        ul.appendChild(li);
+                    });
+
+                    DOM.bodyDisplay.appendChild(ul);
+                } else {
+                    if (trimmedBlock.startsWith('#')) {
+                        const level = (trimmedBlock.match(/^#+/) || ['#'])[0].length;
+                        const cleanText = trimmedBlock.replace(/^#+\s*/, '');
+                        
+                        const heading = document.createElement(level === 1 ? 'h1' : 'h2');
+                        heading.className = level === 1 ? 'fluid-title font-black tracking-tight mt-8 mb-4' : 'fluid-subtitle font-bold text-black dark:text-white pt-6 pb-2';
+                        heading.innerHTML = parseInlineFormatting(cleanText);
+                        DOM.bodyDisplay.appendChild(heading);
+                    }
+                    else if (trimmedBlock.startsWith('**') && trimmedBlock.endsWith('**') && trimmedBlock.length < 120) {
+                        const cleanText = trimmedBlock.replace(/^\*\*|\*\*$/g, '');
+                        const h3 = document.createElement('h3');
+                        h3.className = 'text-lg md:text-xl font-bold text-indigo-600 dark:text-indigo-400 pt-6 pb-2';
+                        h3.innerHTML = parseInlineFormatting(cleanText);
+                        DOM.bodyDisplay.appendChild(h3);
+                    }
+                    else {
+                        const p = document.createElement('p');
+                        p.className = 'smooth-transition text-black dark:text-slate-300 leading-relaxed';
+                        p.innerHTML = parseInlineFormatting(trimmedBlock).replace(/\n/g, '<br>');
+                        DOM.bodyDisplay.appendChild(p);
+                    }
                 }
             });
         }
 
-        // Handles plain text compilation and browser download trigger
+        // Compilazione del file plain text e attivazione del download nel browser
         function downloadText() {
+            if (!DOM || !DOM.headingDisplay || !DOM.bodyDisplay) return;
+
             const title = DOM.headingDisplay.innerText || DOM.headingDisplay.textContent;
-            
-            // Reconstruct plain text from structured body elements
             let textContent = "";
-            const paragraphs = DOM.bodyDisplay.querySelectorAll('p');
+            const paragraphs = DOM.bodyDisplay.querySelectorAll('p, li, h1, h2, h3');
+
             if (paragraphs.length > 0) {
-                paragraphs.forEach(p => {
-                    textContent += p.innerText + "\n\n";
+                paragraphs.forEach(el => {
+                    if (el.tagName === 'LI') {
+                        textContent += "• " + el.innerText + "\n";
+                    } else if (el.tagName.startsWith('H')) {
+                        textContent += "\n" + el.innerText.toUpperCase() + "\n----------------\n";
+                    } else {
+                        textContent += el.innerText + "\n\n";
+                    }
                 });
             } else {
                 textContent = DOM.bodyDisplay.innerText || DOM.bodyDisplay.textContent;
             }
 
-            // Combine title and text into a structured formatting
             const finalString = `${title.toUpperCase()}\n============================\n\n${textContent.trim()}`;
             
-            // Create download payload
             const blob = new Blob([finalString], { type: "text/plain;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             
-            // Generate slug file name from title
-            const fileName = title.toLowerCase()
-                .trim()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, '') || 'essay';
+            const fileName = `${title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
                 
             link.href = url;
             link.setAttribute("download", `${fileName}.txt`);
             document.body.appendChild(link);
             link.click();
             
-            // Cleanup
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
         }
 
-        // Tracks reading progress for the interactive bar at the top
+        // Gestisce e aggiorna la barra di avanzamento dello scorrimento
         function updateProgressBar() {
+            if (!DOM || !DOM.progressBar) return;
             const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
@@ -202,62 +265,72 @@ A questa profonda faglia scientifica si aggiunge una totale divergenza degli int
 
         window.addEventListener('scroll', updateProgressBar);
 
-        // System Dark/Light Mode Auto-detection Engine
+        // Motore per il rilevamento del tema di sistema chiaro/scuro
         function detectSystemTheme() {
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
             
-            // Set initial state based on system preference
+            // Applica la preferenza iniziale del sistema
             setTheme(systemPrefersDark.matches ? 'dark' : 'light');
 
-            // Listen for system changes in real-time
+            // Resta in ascolto di eventuali modifiche dinamiche al tema del sistema
             systemPrefersDark.addEventListener('change', (e) => {
                 setTheme(e.matches ? 'dark' : 'light');
             });
         }
 
-        // Apply a specific theme's visual configuration
+        // Configura gli stili per il tema selezionato ('light' o 'dark')
         function setTheme(newTheme) {
             state.theme = newTheme;
+            if (!DOM || !DOM.body) return;
 
             if (newTheme === 'light') {
-                // Light Paper Theme
-                DOM.body.className = "bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
+                // Rimuove la classe dark dall'elemento HTML radice
+                document.documentElement.classList.remove('dark');
+
+                // Tema Chiaro (Ottimizzato con testo nero assoluto nel corpo)
+                DOM.body.className = "bg-slate-50 text-black min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
                 DOM.appHeader.className = "w-full fixed top-0 left-0 bg-white/90 backdrop-blur-md border-b border-slate-200/80 z-50 smooth-transition";
-                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-500";
+                DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-600 font-semibold";
                 
-                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
-                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all smooth-transition";
+                DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 hover:text-black transition-all smooth-transition";
+                DOM.themeBtn.className = "p-2 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 hover:text-black transition-all smooth-transition";
+
+                DOM.articleHeader.className = "space-y-6 pb-6 border-b border-slate-200 smooth-transition";
+                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-slate-700 bg-clip-text text-transparent smooth-transition";
+                DOM.metaText.className = "text-xs font-mono text-indigo-700 uppercase tracking-wider font-semibold";
+                DOM.bodyDisplay.className = "fluid-body-text text-black space-y-6 smooth-transition";
+                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-500 font-mono select-none border-t border-slate-200 max-w-4xl mx-auto smooth-transition";
                 
-                DOM.articleHeader.className = "space-y-4 pb-8 border-b border-slate-200 smooth-transition";
-                DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent smooth-transition";
-                DOM.metaText.className = "text-xs font-mono text-indigo-600 uppercase tracking-wider";
-                DOM.bodyDisplay.className = "fluid-body-text text-slate-700 space-y-6 smooth-transition";
-                DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-400 font-mono select-none border-t border-slate-200 max-w-4xl mx-auto smooth-transition";
-                
-                // SVG Moon Icon representing the option to toggle to dark mode
+                // Icona Luna per l'opzione di passaggio al tema scuro
                 DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
             } 
             else if (newTheme === 'dark') {
-                // Classic Dark Mode (Slate-950)
+                // Aggiunge la classe dark all'elemento HTML radice
+                document.documentElement.classList.add('dark');
+
+                // Tema Scuro Classico (Slate-950)
                 DOM.body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans smooth-transition";
                 DOM.appHeader.className = "w-full fixed top-0 left-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/80 z-50 smooth-transition";
                 DOM.logoText.className = "text-xs font-mono tracking-widest text-slate-400";
                 
                 DOM.downloadBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
                 DOM.themeBtn.className = "p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-all smooth-transition";
-                
-                DOM.articleHeader.className = "space-y-4 pb-8 border-b border-slate-900 smooth-transition";
+
+                DOM.articleHeader.className = "space-y-6 pb-6 border-b border-slate-900 smooth-transition";
                 DOM.headingDisplay.className = "fluid-title font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent smooth-transition";
                 DOM.metaText.className = "text-xs font-mono text-indigo-400 uppercase tracking-wider";
                 DOM.bodyDisplay.className = "fluid-body-text text-slate-300 space-y-6 smooth-transition";
                 DOM.appFooter.className = "w-full text-center py-8 text-[10px] text-slate-600 font-mono select-none border-t border-slate-900/60 max-w-4xl mx-auto smooth-transition";
                 
-                // SVG Sun Icon representing the option to toggle to light mode
+                // Icona Sole per l'opzione di passaggio al tema chiaro
                 DOM.themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>`;
             } 
+            
+            // Ri-renderizza il testo per applicare correttamente le modifiche cromatiche inline
+            renderBodyText(extendedData);
         }
 
-        // Cycle manually triggered by clicking the top right icon (only Dark and Light)
+        // Commutazione manuale del tema avviata tramite click sull'icona
         function toggleTheme() {
             if (state.theme === 'light') {
                 setTheme('dark');
@@ -266,11 +339,12 @@ A questa profonda faglia scientifica si aggiunge una totale divergenza degli int
             }
         }
 
-        // Initialize progress, format text, and load rendering
+        // Avvio di tutte le componenti al caricamento completo della finestra
         window.onload = function() {
-            formatBodyText(); // Run format immediately before anything else
-            updateProgressBar();
-            detectSystemTheme(); // Auto-detect and set initial mode
+            initDOM(); // Mappa gli elementi HTML nell'oggetto globale DOM prima di eseguire qualsiasi logica
+            renderBodyText(extendedData); // Carica il saggio iniziale
+            updateProgressBar(); // Calcola la barra di progresso iniziale
+            detectSystemTheme(); // Rileva il tema di sistema preferito dell'utente
         };
     </script>
 </body>
