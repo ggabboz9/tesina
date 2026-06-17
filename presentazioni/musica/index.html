@@ -1,1 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Presentazione Intera</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    screens: {
+                        'xs': '400px',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts & FontAwesome for minimalist icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #050505; /* Deeper premium absolute pitch black */
+            color: #ffffff;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+            /* Support iOS safe area spacing natively */
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        
+        /* Hardware accelerated layout layers */
+        .slide-layer {
+            position: absolute;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            backface-visibility: hidden;
+            perspective: 1000px;
+            will-change: transform, opacity;
+            /* Premium cubic-bezier transition curve for organic glide */
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
+        /* Spring-assisted expanding container for checkpoints */
+        .checkpoints-tray {
+            transition: max-width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        padding 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Springy hover transitions for UI buttons */
+        .springy-btn {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        background-color 0.2s ease, 
+                        color 0.2s ease;
+            z-index: 10; /* Ensure buttons sit cleanly above ambient background glow canvas */
+        }
+        @media (hover: hover) {
+            .springy-btn:hover {
+                transform: scale(1.08);
+            }
+        }
+        .springy-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* Safe padding support for floating controls */
+        #controls-wrapper {
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        }
+
+        /* Matte Liquid Glass container styling with relative setup for coordinate cursor light */
+        .matte-liquid-glass {
+            position: relative;
+            background: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 
+                        inset 0 1px 0px 0px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        /* Matte glass interactive spot-glow element */
+        .liquid-glass-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(
+                120px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+                rgba(255, 255, 255, 0.12),
+                rgba(255, 255, 255, 0) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            will-change: background;
+        }
+
+        /* Light up background slightly on active hover states */
+        .matte-liquid-glass:hover .liquid-glass-glow {
+            opacity: 1;
+        }
+
+        /* Hide scrollbars for the checkpoint track on tiny mobile displays */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen flex flex-col relative font-sans overflow-hidden">
+
+    <!-- TINY TOP-RIGHT UI TOGGLE BUTTON -->
+    <button id="toggle-ui-btn" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-neutral-900/40 hover:bg-neutral-900/90 border border-neutral-800/40 hover:border-neutral-700 text-neutral-400 hover:text-white transition-all duration-300 opacity-50 hover:opacity-100 active:scale-95" title="Toggle UI Controls (Key: H)">
+        <i id="toggle-ui-icon" class="fa-solid fa-eye-slash text-xs"></i>
+    </button>
+
+    <!-- MAIN SLIDE CANVAS WRAPPER -->
+    <main id="main-canvas" class="flex-1 w-full h-full pt-4 px-4 pb-28 sm:pb-24 md:pt-8 md:px-8 flex items-center justify-center relative overflow-hidden">
+        
+        <!-- LAYER 1 (Active Slide Element) -->
+        <img 
+            id="slide-image-primary" 
+            src="" 
+            alt="Presentation Slide" 
+            class="slide-layer drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] opacity-100"
+        >
+
+        <!-- LAYER 2 (Secondary Overlay Slide Element for Cross-Buffering) -->
+        <img 
+            id="slide-image-secondary" 
+            src="" 
+            alt="Presentation Slide Secondary" 
+            class="slide-layer drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none"
+        >
+        
+        <!-- Optional Loading Spinner -->
+        <div id="loading-spinner" class="absolute inset-0 flex items-center justify-center hidden bg-[#050505]/40 backdrop-blur-sm transition-opacity duration-300">
+            <i class="fa-solid fa-circle-notch fa-spin text-neutral-500 text-3xl"></i>
+        </div>
+    </main>
+
+    <!-- SECTION TITLE LABEL (Floating above controls) -->
+    <div id="section-label-container" class="absolute bottom-32 left-0 right-0 flex justify-center z-40 pointer-events-none">
+        <div id="section-title" class="bg-neutral-900/60 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-widest text-neutral-400 uppercase opacity-0 transition-opacity duration-500">
+            Section Name
+        </div>
+    </div>
+
+    <!-- FLOATING BOTTOM NAVIGATION TAB -->
+    <div id="controls-wrapper" class="absolute left-0 right-0 flex justify-center z-50 transition-all duration-500 ease-in-out transform translate-y-0 opacity-100 max-w-[95%] sm:max-w-max mx-auto select-none">
+        <!-- Matte Liquid Glass Container Capsule with Balanced Uniform Padding -->
+        <div id="matte-glass-container" class="matte-liquid-glass rounded-full p-1.5 sm:p-2 flex items-center gap-3 sm:gap-5 max-w-full overflow-hidden">
+            
+            <!-- Mouse Coordinates Spot-light Glow Layer -->
+            <div id="glass-spot-glow" class="liquid-glass-glow"></div>
+
+            <!-- Previous Button -->
+            <button id="prev-btn" class="w-11 h-11 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-white hover:bg-white/10 springy-btn" title="Previous Slide (Left Arrow)">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            
+            <!-- Slide Counter -->
+            <div class="text-xs shrink-0 font-semibold tracking-widest text-neutral-400 hover:text-white transition-all font-mono w-16 text-center select-none cursor-pointer hover:scale-105 active:scale-95 duration-150 py-1 z-10" id="slide-counter">
+                1 / 1
+            </div>
+
+            <!-- Optional Checkpoint Divider -->
+            <div id="ui-divider" class="w-[1px] h-5 shrink-0 bg-white/10 transition-all duration-500 ease-out opacity-0 max-w-0 hidden"></div>
+
+            <!-- Clickable Checkpoint Timeline Dots -->
+            <div id="checkpoints-container" class="checkpoints-tray flex items-center gap-1 py-1 overflow-x-auto no-scrollbar opacity-0 max-w-0 pointer-events-none hidden z-10">
+                <!-- Clickable dots generated dynamically via JS -->
+            </div>
+            
+            <!-- Next Button -->
+            <button id="next-btn" class="w-11 h-11 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-white hover:bg-white/10 springy-btn" title="Next Slide (Right Arrow / Space)">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+            
+        </div>
+    </div>
+
+    <!-- APPLICATION LOGIC -->
+    <script>
+        // ==========================================
+        // 1. DEVELOPER CONFIGURATION
+        // ==========================================
+        const CONFIG = {
+            // Animation Style for Slide transitions:
+            // 'slide-directional' -> Premium direction-aware horizontal kinetic fluid glide (Highly recommended!)
+            // 'zoom-fade'         -> Smooth cinematic micro-scaling cross-fade
+            // 'classic-fade'      -> Minimal opacity-only cross-fade
+            // 'none'              -> Instant slide swapping
+            transitionStyle: 'slide-directional',
+
+            // Duration of the transitions in milliseconds (Buttely-smooth 500ms)
+            transitionDuration: 800,
+
+            // How many slides do you want to show? 
+            // Set to 0 or null to automatically use all images in the slides array below.
+            limitNumberOfSlides: 0,
+
+            // Set to false to completely hide/disable the visual arrows & counters.
+            showUiControls: true, 
+
+            // If showUiControls is true, set this to false to start with the UI hidden.
+            startWithUiVisible: true,
+
+            // Master switch for visual checkpoints (navigation dots) in the controls bar
+            showCheckpoints: false,
+
+            // If true, checkpoints are hidden by default and expand/collapse when clicking the slide counter.
+            // If false, checkpoints will be permanently displayed next to the counter.
+            clickCounterToShowCheckpoints: true,
+
+            // Enable or disable keyboard navigation (Arrows, Spacebar)
+            enableKeyboardNavigation: true,
+
+            // Enable or disable swipe navigation on mobile/trackpads
+            enableSwipeNavigation: true
+        };
+
+        // ==========================================
+        // 2. SLIDE DATA: 32 DIVERSE JPG IMAGE URLS
+        // ==========================================
+        const slides = [
+ 
+            { url: "/tesina/presentazioni/musica/mch1.jpg" , name: "Musica" }, // Slide 13
+            { url: "/tesina/presentazioni/musica/m2.jpg" , name: "Musica" }, // Slide 14
+            { url: "/tesina/presentazioni/musica/ch3.jpg" , name: "Musica" }, // Slide 15
+ 
+            
+        ];
+
+        // Active state holding and double-buffering configurations
+        let activeSlides = [];
+        let checkpointMapping = []; // Tracks which active checkpoint name maps to which visual dot and slide index
+        let currentIndex = 0;
+        let isUiVisible = CONFIG.startWithUiVisible;
+        let isCheckpointsTrayExpanded = false;
+        let isTransitioning = false; 
+        
+        // Background Image Memory Cache (URL -> Image Object)
+        const imageCache = {};
+
+        // Image Double Buffers
+        let primaryImg, secondaryImg;
+        let activeImg, inactiveImg;
+
+        // DOM Elements
+        const mainCanvas = document.getElementById('main-canvas');
+        const sectionTitle = document.getElementById('section-title');
+        const slideCounter = document.getElementById('slide-counter');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        
+        const controlsWrapper = document.getElementById('controls-wrapper');
+        const matteGlassContainer = document.getElementById('matte-glass-container');
+        const glassSpotGlow = document.getElementById('glass-spot-glow');
+        const toggleUiBtn = document.getElementById('toggle-ui-btn');
+        const toggleUiIcon = document.getElementById('toggle-ui-icon');
+
+        const uiDivider = document.getElementById('ui-divider');
+        const checkpointsContainer = document.getElementById('checkpoints-container');
+
+        // Function to initialize active slide deck list based on limits
+        function initSlideData() {
+            if (CONFIG.limitNumberOfSlides > 0) {
+                activeSlides = slides.slice(0, CONFIG.limitNumberOfSlides);
+            } else {
+                activeSlides = [...slides];
+            }
+
+            if (activeSlides.length === 0) {
+                activeSlides = [{ url: "https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80", name: "Fallback" }];
+            }
+
+            // Assign Dual Image Buffer Hooks
+            primaryImg = document.getElementById('slide-image-primary');
+            secondaryImg = document.getElementById('slide-image-secondary');
+            
+            // Primary starts active, Secondary is hidden in background buffer
+            activeImg = primaryImg;
+            inactiveImg = secondaryImg;
+        }
+
+        // Sequential Preloader service
+        // Loads images step-by-step in the background, creating a bulletproof client memory cache
+        function startPreloadingService() {
+            let indexToPreload = 0;
+
+            function preloadNext() {
+                if (indexToPreload >= activeSlides.length) return; // Finished preloading all images
+
+                const targetUrl = activeSlides[indexToPreload].url;
+                
+                // If it's already in the cache map, skip immediately
+                if (imageCache[targetUrl]) {
+                    indexToPreload++;
+                    preloadNext();
+                    return;
+                }
+
+                const img = new Image();
+                img.src = targetUrl;
+                img.onload = img.onerror = () => {
+                    // Cache the loaded instance
+                    imageCache[targetUrl] = img;
+                    indexToPreload++;
+                    preloadNext(); // Proceed to preload the next image
+                };
+            }
+
+            // Initiate the sequential loader thread
+            preloadNext();
+        }
+
+        // Setup the liquid glass coordinate tracker for hovering cursor glow
+        function setupLiquidGlassTracker() {
+            matteGlassContainer.addEventListener('mousemove', (e) => {
+                const rect = matteGlassContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x coordinate relative to container
+                const y = e.clientY - rect.top;  // y coordinate relative to container
+
+                matteGlassContainer.style.setProperty('--mouse-x', `${x}px`);
+                matteGlassContainer.style.setProperty('--mouse-y', `${y}px`);
+            });
+        }
+
+        // Resolves the name of a slide at any index by looking backwards for the most recent named slide
+        function getResolvedSectionName(idx) {
+            for (let i = idx; i >= 0; i--) {
+                if (activeSlides[i] && activeSlides[i].name && activeSlides[i].name.trim() !== "") {
+                    return activeSlides[i].name.trim();
+                }
+            }
+            return null;
+        }
+
+        // Extracts all unique resolved section names in chronological order
+        function getUniqueSections() {
+            const sections = [];
+            activeSlides.forEach((slide, idx) => {
+                const name = getResolvedSectionName(idx);
+                if (name && !sections.includes(name)) {
+                    sections.push(name);
+                }
+            });
+            return sections;
+        }
+
+        // Function to apply developer configuration settings
+        function applyDeveloperConfig() {
+            if (!CONFIG.showUiControls) {
+                controlsWrapper.style.display = 'none';
+                toggleUiBtn.style.display = 'none';
+                
+                mainCanvas.classList.remove('pb-28', 'sm:pb-24');
+                mainCanvas.classList.add('pb-4', 'md:pb-8');
+            } else {
+                // Apply dynamic CSS transition duration from configuration block
+                const speedInSecs = (CONFIG.transitionDuration / 1000).toFixed(2) + 's';
+                primaryImg.style.transitionDuration = speedInSecs;
+                secondaryImg.style.transitionDuration = speedInSecs;
+
+                if (!CONFIG.startWithUiVisible) {
+                    isUiVisible = true;
+                    toggleUiVisibility();
+                }
+
+                // If user wants interactive checkpoints, prepare the container
+                if (CONFIG.showCheckpoints) {
+                    buildCheckpoints();
+
+                    if (CONFIG.clickCounterToShowCheckpoints) {
+                        // Make counter look clickable and handle the click to expand/collapse
+                        slideCounter.classList.add('cursor-pointer');
+                        slideCounter.setAttribute('title', 'Click to show timeline checkpoints');
+                        slideCounter.addEventListener('click', toggleCheckpointsTray);
+                        
+                        // Ensure they start collapsed
+                        isCheckpointsTrayExpanded = false;
+                        collapseCheckpointsTray(false); // fast instant collapse
+                    } else {
+                        // Permanently display checkpoints
+                        isCheckpointsTrayExpanded = true;
+                        expandCheckpointsTray(false);
+                    }
+                }
+
+                // Start interactive liquid glass glow track
+                setupLiquidGlassTracker();
+            }
+        }
+
+        // Generate dynamic interactive checkpoint indicators for specified slides only
+        // Enhanced for mobile devices with comfortably large tap areas wrapped around minimal visual dots
+        function buildCheckpoints() {
+            if (!CONFIG.showCheckpoints) return;
+            checkpointsContainer.innerHTML = '';
+            checkpointMapping = []; // reset map array
+            
+            const sections = getUniqueSections();
+            
+            sections.forEach((sectionName, mapIndex) => {
+                // Outer button acts as a robust 24px tap target safe area on touchscreens
+                const dot = document.createElement('button');
+                dot.setAttribute('title', sectionName);
+                dot.className = "group shrink-0 h-6 w-6 flex items-center justify-center springy-btn focus:outline-none";
+                
+                // Inner span represents the sleek minimalist visual indicator
+                const dotVisual = document.createElement('span');
+                
+                // Find the FIRST slide index that has this resolved section name
+                const firstSlideIdx = activeSlides.findIndex((s, idx) => getResolvedSectionName(idx) === sectionName);
+                
+                checkpointMapping.push({
+                    element: dot,
+                    sectionName: sectionName,
+                    firstSlideIndex: firstSlideIdx
+                });
+
+                // Highlight state check
+                const currentResolvedName = getResolvedSectionName(currentIndex);
+                const isActive = (currentResolvedName === sectionName);
+                
+                dotVisual.className = `rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                    isActive 
+                    ? 'w-5 h-1.5 bg-white' 
+                    : 'w-1.5 h-1.5 bg-neutral-600 group-hover:bg-neutral-300'
+                }`;
+
+                dot.appendChild(dotVisual);
+
+                // Add Hover Interaction for Section Name
+                dot.addEventListener('mouseenter', () => {
+                    sectionTitle.innerText = sectionName;
+                    sectionTitle.classList.add('opacity-100');
+                    sectionTitle.classList.remove('opacity-0');
+                });
+                dot.addEventListener('mouseleave', () => {
+                    const activeName = getResolvedSectionName(currentIndex);
+                    if (activeName) {
+                        sectionTitle.innerText = activeName;
+                    } else {
+                        sectionTitle.classList.add('opacity-0');
+                    }
+                });
+
+                dot.addEventListener('click', () => {
+                    updateSlide(firstSlideIdx);
+                });
+
+                checkpointsContainer.appendChild(dot);
+            });
+        }
+
+        // Expand the checkpoints tray inline smoothly
+        function expandCheckpointsTray(animate = true) {
+            // Un-hide to participate in flex rendering layout
+            uiDivider.classList.remove('hidden');
+            checkpointsContainer.classList.remove('hidden');
+
+            if (!animate) {
+                checkpointsContainer.style.transition = 'none';
+                uiDivider.style.transition = 'none';
+            }
+            
+            // Force browser layout repaint to register the display toggle before transitioning
+            checkpointsContainer.offsetHeight;
+            
+            uiDivider.classList.remove('opacity-0', 'max-w-0');
+            uiDivider.classList.add('opacity-100', 'max-w-[15px]');
+            
+            checkpointsContainer.classList.remove('opacity-0', 'max-w-0', 'pointer-events-none');
+            // Responsive mobile friendly widths (max-w-[120px] dynamically expands neatly on smaller devices)
+            checkpointsContainer.classList.add('opacity-100', 'max-w-[120px]', 'xs:max-w-[200px]', 'sm:max-w-[400px]', 'md:max-w-[600px]', 'px-1');
+            
+            if (!animate) {
+                checkpointsContainer.offsetHeight; 
+                checkpointsContainer.style.transition = '';
+                uiDivider.style.transition = '';
+            }
+        }
+
+        // Collapse the checkpoints tray inline smoothly and remove it from flex gaps
+        function collapseCheckpointsTray(animate = true) {
+            if (!animate) {
+                checkpointsContainer.style.transition = 'none';
+                uiDivider.style.transition = 'none';
+            }
+
+            uiDivider.classList.remove('opacity-100', 'max-w-[15px]');
+            uiDivider.classList.add('opacity-0', 'max-w-0');
+            
+            checkpointsContainer.classList.remove('opacity-100', 'max-w-[120px]', 'xs:max-w-[200px]', 'sm:max-w-[400px]', 'md:max-w-[600px]', 'px-1');
+            checkpointsContainer.classList.add('opacity-0', 'max-w-0', 'pointer-events-none');
+
+            if (!animate) {
+                uiDivider.classList.add('hidden');
+                checkpointsContainer.classList.add('hidden');
+                checkpointsContainer.style.transition = '';
+                uiDivider.style.transition = '';
+            } else {
+                // Safely add display:none once sliding-shut animation finishes (prevents the gaps stacking bug)
+                setTimeout(() => {
+                    if (!isCheckpointsTrayExpanded) {
+                        uiDivider.classList.add('hidden');
+                        checkpointsContainer.classList.add('hidden');
+                    }
+                }, CONFIG.transitionDuration); // matching transition timeline
+            }
+        }
+
+        // Toggle Expand/Collapse Tray Action
+        function toggleCheckpointsTray() {
+            isCheckpointsTrayExpanded = !isCheckpointsTrayExpanded;
+            if (isCheckpointsTrayExpanded) {
+                expandCheckpointsTray(true);
+                slideCounter.classList.add('text-white');
+                slideCounter.setAttribute('title', 'Click to hide timeline checkpoints');
+                
+                // Auto-scroll current active dot into view upon expanding
+                setTimeout(() => {
+                    const currentResolvedName = getResolvedSectionName(currentIndex);
+                    const activeMap = checkpointMapping.find(m => m.sectionName === currentResolvedName);
+                    if (activeMap && activeMap.element) {
+                        activeMap.element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                }, 150);
+            } else {
+                collapseCheckpointsTray(true);
+                slideCounter.classList.remove('text-white');
+                slideCounter.setAttribute('title', 'Click to show timeline checkpoints');
+            }
+        }
+
+        // Update checkpoint highlight state as viewer navigates through slides
+        function updateCheckpoints(activeIndex) {
+            if (!CONFIG.showCheckpoints) return;
+            
+            const currentResolvedName = getResolvedSectionName(activeIndex);
+            
+            // Update the Section Label Display
+            if (currentResolvedName) {
+                sectionTitle.innerText = currentResolvedName;
+                sectionTitle.classList.remove('opacity-0');
+                sectionTitle.classList.add('opacity-100');
+            } else {
+                sectionTitle.classList.add('opacity-0');
+            }
+
+            checkpointMapping.forEach(map => {
+                const isActive = (map.sectionName === currentResolvedName);
+                const visualSpan = map.element.querySelector('span');
+                if (visualSpan) {
+                    if (isActive) {
+                        visualSpan.className = 'rounded-full w-5 h-1.5 bg-white transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]';
+                    } else {
+                        visualSpan.className = 'rounded-full w-1.5 h-1.5 bg-neutral-600 group-hover:bg-neutral-300 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]';
+                    }
+                }
+            });
+        }
+
+        // Function to toggle UI elements (User trigger)
+        function toggleUiVisibility() {
+            if (!CONFIG.showUiControls) return; 
+
+            isUiVisible = !isUiVisible;
+            if (isUiVisible) {
+                controlsWrapper.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+                controlsWrapper.classList.add('translate-y-0', 'opacity-100');
+                toggleUiIcon.className = 'fa-solid fa-eye-slash text-xs';
+                toggleUiBtn.setAttribute('title', 'Hide UI Controls (Key: H)');
+            } else {
+                controlsWrapper.classList.remove('translate-y-0', 'opacity-100');
+                controlsWrapper.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+                toggleUiIcon.className = 'fa-solid fa-eye text-xs';
+                toggleUiBtn.setAttribute('title', 'Show UI Controls (Key: H)');
+            }
+        }
+
+        // Dual-buffered slide state transitions with instant interruptibility & speed caching checks
+        function updateSlide(newIndex) {
+            if (newIndex < 0) newIndex = activeSlides.length - 1; 
+            if (newIndex >= activeSlides.length) newIndex = 0;    
+            
+            if (currentIndex === newIndex && activeImg.src) return;
+
+            // INTERRUPT SYSTEM: If a user triggers a slide change while an animation is already running,
+            // we immediately finalize the current transition animation, snap layers to their final state,
+            // swap active layer buffer roles, and proceed with the next transition cleanly.
+            if (isTransitioning) {
+                primaryImg.style.transition = 'none';
+                secondaryImg.style.transition = 'none';
+                
+                // Instantly complete the pending state: the inactive image becomes fully active and visible
+                inactiveImg.style.opacity = '1';
+                inactiveImg.style.transform = 'translate3d(0, 0, 0) scale3d(1, 1, 1)';
+                inactiveImg.style.pointerEvents = 'auto';
+                
+                // The outgoing active image disappears immediately
+                activeImg.style.opacity = '0';
+                activeImg.style.transform = 'translate3d(0, 0, 0) scale3d(1, 1, 1)';
+                activeImg.style.pointerEvents = 'none';
+                
+                // Force layout reflow to register style changes instantly
+                inactiveImg.offsetHeight;
+                
+                // Formally swap active references to complete the interrupted buffer swap
+                const temp = activeImg;
+                activeImg = inactiveImg;
+                inactiveImg = temp;
+                
+                // Restore default transition parameters
+                const speedInSecs = (CONFIG.transitionDuration / 1000).toFixed(2) + 's';
+                primaryImg.style.transition = '';
+                secondaryImg.style.transition = '';
+                primaryImg.style.transitionDuration = speedInSecs;
+                secondaryImg.style.transitionDuration = speedInSecs;
+                
+                isTransitioning = false;
+            }
+            
+            isTransitioning = true;
+
+            // Determine flow direction (Forward vs Backward)
+            const isForward = (newIndex > currentIndex && !(currentIndex === 0 && newIndex === activeSlides.length - 1)) || (currentIndex === activeSlides.length - 1 && newIndex === 0);
+            
+            // Set up buffer swap
+            const outgoing = activeImg;
+            const incoming = inactiveImg;
+
+            const targetUrl = activeSlides[newIndex].url;
+
+            // Master transition trigger
+            const executeTransition = () => {
+                // Hide loader
+                loadingSpinner.classList.remove('opacity-100');
+                loadingSpinner.classList.add('hidden');
+
+                // 1. Prepare Initial Entry Position for Incoming Slide (Still Hidden)
+                incoming.style.transition = 'none'; // Instant placement
+                
+                if (CONFIG.transitionStyle === 'slide-directional') {
+                    if (isForward) {
+                        incoming.style.transform = 'translate3d(120px, 0, 0) scale3d(1.02, 1.02, 1)';
+                    } else {
+                        incoming.style.transform = 'translate3d(-120px, 0, 0) scale3d(1.02, 1.02, 1)';
+                    }
+                } else if (CONFIG.transitionStyle === 'zoom-fade') {
+                    incoming.style.transform = 'translate3d(0, 0, 0) scale3d(1.06, 1.06, 1)';
+                } else {
+                    incoming.style.transform = 'translate3d(0, 0, 0) scale3d(1, 1, 1)';
+                }
+                
+                incoming.style.opacity = '0';
+                
+                // Force a browser paint flow to commit entry position layout
+                incoming.offsetHeight;
+                
+                // Restore Transition Engine Properties
+                const speedInSecs = (CONFIG.transitionDuration / 1000).toFixed(2) + 's';
+                incoming.style.transition = '';
+                outgoing.style.transition = '';
+                incoming.style.transitionDuration = speedInSecs;
+                outgoing.style.transitionDuration = speedInSecs;
+
+                // 2. Perform Active Animation Stage
+                requestAnimationFrame(() => {
+                    // Outgoing Element exits scene
+                    if (CONFIG.transitionStyle === 'slide-directional') {
+                        if (isForward) {
+                            outgoing.style.transform = 'translate3d(-100px, 0, 0) scale3d(0.96, 0.96, 1)';
+                        } else {
+                            outgoing.style.transform = 'translate3d(100px, 0, 0) scale3d(0.96, 0.96, 1)';
+                        }
+                    } else if (CONFIG.transitionStyle === 'zoom-fade') {
+                        outgoing.style.transform = 'translate3d(0, 0, 0) scale3d(0.94, 0.94, 1)';
+                    } else {
+                        outgoing.style.transform = 'translate3d(0, 0, 0) scale3d(1, 1, 1)';
+                    }
+                    
+                    outgoing.style.opacity = '0';
+                    outgoing.style.pointerEvents = 'none';
+
+                    // Incoming Element enters active center stage
+                    incoming.style.transform = 'translate3d(0, 0, 0) scale3d(1, 1, 1)';
+                    incoming.style.opacity = '1';
+                    incoming.style.pointerEvents = 'auto';
+                });
+
+                // Swap Active references 
+                activeImg = incoming;
+                inactiveImg = outgoing;
+
+                currentIndex = newIndex;
+
+                // Update text layout properties
+                slideCounter.innerText = `${currentIndex + 1} / ${activeSlides.length}`;
+                updateCheckpoints(currentIndex);
+
+                // Auto-scroll current active checkpoint dots into view inside the tray
+                const currentResolvedName = getResolvedSectionName(currentIndex);
+                const activeMap = checkpointMapping.find(m => m.sectionName === currentResolvedName);
+                if (activeMap && activeMap.element && isCheckpointsTrayExpanded) {
+                    activeMap.element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+
+                // Unlock transition queue
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, CONFIG.transitionDuration); // Matches exact duration timeout configured in CSS / JS
+            };
+
+            // Check if slide is already cached in memory
+            const cachedImage = imageCache[targetUrl];
+            if (cachedImage && cachedImage.complete) {
+                // INSTANT TRANSITION: Skip the load screen because the image is already pre-loaded!
+                incoming.src = targetUrl;
+                executeTransition();
+            } else {
+                // FALLBACK: If not yet cached, show spinner and wait for load
+                loadingSpinner.classList.remove('hidden');
+                loadingSpinner.classList.add('opacity-100');
+
+                incoming.src = targetUrl;
+                incoming.onload = executeTransition;
+                incoming.onerror = () => {
+                    isTransitioning = false;
+                    loadingSpinner.classList.add('hidden');
+                };
+            }
+        }
+
+        // Section jumping logic
+        function goToNextCheckpoint() {
+            if (checkpointMapping.length === 0) return;
+            const currentSectionName = getResolvedSectionName(currentIndex);
+            const currentCheckpointIdx = checkpointMapping.findIndex(m => m.sectionName === currentSectionName);
+            
+            if (currentCheckpointIdx !== -1 && currentCheckpointIdx < checkpointMapping.length - 1) {
+                updateSlide(checkpointMapping[currentCheckpointIdx + 1].firstSlideIndex);
+            } else {
+                updateSlide(checkpointMapping[0].firstSlideIndex);
+            }
+        }
+
+        // Section jumping logic (Previous)
+        function goToPrevCheckpoint() {
+            if (checkpointMapping.length === 0) return;
+            const currentSectionName = getResolvedSectionName(currentIndex);
+            const currentCheckpointIdx = checkpointMapping.findIndex(m => m.sectionName === currentSectionName);
+            
+            if (currentCheckpointIdx > 0) {
+                updateSlide(checkpointMapping[currentCheckpointIdx - 1].firstSlideIndex);
+            } else {
+                updateSlide(checkpointMapping[checkpointMapping.length - 1].firstSlideIndex);
+            }
+        }
+
+        // Event Listeners for Buttons
+        prevBtn.addEventListener('click', () => updateSlide(currentIndex - 1));
+        nextBtn.addEventListener('click', () => updateSlide(currentIndex + 1));
+        toggleUiBtn.addEventListener('click', toggleUiVisibility);
+
+        // Event Listeners for Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (CONFIG.enableKeyboardNavigation) {
+                if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+                    updateSlide(currentIndex + 1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    updateSlide(currentIndex - 1);
+                }
+            }
+            
+            if (e.key.toLowerCase() === 'h' && CONFIG.showUiControls) {
+                toggleUiVisibility();
+            }
+        });
+
+        // Touch swipe gestures for general viewport/slide area (swipes slides)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (CONFIG.enableSwipeNavigation) {
+                handleSwipe();
+            }
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50; 
+            if (touchEndX < touchStartX - swipeThreshold) {
+                updateSlide(currentIndex + 1); 
+            } else if (touchEndX > touchStartX + swipeThreshold) {
+                updateSlide(currentIndex - 1); 
+            }
+        }
+
+        // Specialized touch swipe gestures on the bottom bar
+        let barTouchStartX = 0;
+
+        controlsWrapper.addEventListener('touchstart', (e) => {
+            barTouchStartX = e.changedTouches[0].screenX;
+            // Prevent the swipe from bubbling up to document and causing double slide moves
+            e.stopPropagation();
+        }, { passive: true });
+
+        controlsWrapper.addEventListener('touchend', (e) => {
+            const barTouchEndX = e.changedTouches[0].screenX;
+            if (CONFIG.enableSwipeNavigation) {
+                handleBarSwipe(barTouchStartX, barTouchEndX);
+            }
+            e.stopPropagation();
+        }, { passive: true });
+
+        // Swiping the bottom control bar now ALWAYS swipes between checkpoints/sections
+        // regardless of whether the visual checkpoint timeline menu tray is open or closed!
+        function handleBarSwipe(startX, endX) {
+            const swipeThreshold = 40; 
+            if (endX < startX - swipeThreshold) {
+                if (CONFIG.showCheckpoints && checkpointMapping.length > 0) {
+                    goToNextCheckpoint(); // Jump directly to next checkpoint section
+                } else {
+                    updateSlide(currentIndex + 1); // Fallback if checkpoints disabled
+                }
+            } else if (endX > startX + swipeThreshold) {
+                if (CONFIG.showCheckpoints && checkpointMapping.length > 0) {
+                    goToPrevCheckpoint(); // Jump directly to previous checkpoint section
+                } else {
+                    updateSlide(currentIndex - 1); // Fallback if checkpoints disabled
+                }
+            }
+        }
+
+        // Initialize presentation on load
+        window.onload = () => {
+            initSlideData();
+            applyDeveloperConfig();
+            
+            // Set initial image directly
+            activeImg.src = activeSlides[currentIndex].url;
+            slideCounter.innerText = `${currentIndex + 1} / ${activeSlides.length}`;
+            
+            // Pre-seed the cache with our active starting slide
+            const firstPreload = new Image();
+            firstPreload.src = activeSlides[currentIndex].url;
+            imageCache[activeSlides[currentIndex].url] = firstPreload;
+
+            // Start preloading the entire presentation in the background
+            startPreloadingService();
+        };
+    </script>
+</body>
+</html>
